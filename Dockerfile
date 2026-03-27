@@ -1,5 +1,3 @@
-FROM node:20-alpine AS base
-
 FROM node:20-alpine AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
