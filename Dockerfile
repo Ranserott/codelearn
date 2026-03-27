@@ -1,3 +1,5 @@
+FROM node:20-alpine AS base
+
 FROM node:20-alpine AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
@@ -17,6 +19,7 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./.next/standalone
 COPY --from=builder /app/.next/static ./.next/static
 COPY --from=builder /app/.next/server ./.next/server
+COPY --from=builder /app/.next/cache ./.next/cache
 
 EXPOSE 3000
 ENV PORT=3000
