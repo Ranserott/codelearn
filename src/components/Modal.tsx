@@ -33,7 +33,7 @@ export default function Modal() {
   const handleClose = () => {
     setSelectedLesson(null);
     setIsEditorOpen(false);
-    setEditedCode({ html: '', css: '', javascript: '', git: '' });
+    setEditedCode({ html: '', css: '', javascript: '', git: undefined });
   };
 
   const handleOpenEdit = () => {
@@ -177,7 +177,7 @@ export default function Modal() {
 
   // Reset editedCode when switching lessons
   React.useEffect(() => {
-    setEditedCode({ html: '', css: '', javascript: '', git: '' });
+    setEditedCode({ html: '', css: '', javascript: '', git: undefined });
     setIsFullscreen(false);
   }, [selectedLesson?.id]);
 
