@@ -28,6 +28,7 @@ export default function Card({ lesson }: CardProps) {
     html: darkMode ? 'text-orange-400' : 'text-orange-600',
     css: darkMode ? 'text-blue-400' : 'text-blue-600',
     javascript: darkMode ? 'text-yellow-400' : 'text-yellow-600',
+    git: darkMode ? 'text-red-400' : 'text-red-600',
   };
 
   const colorClass = categoryColors[lesson.category] || categoryColors.fundamentos;
