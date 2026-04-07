@@ -25,6 +25,12 @@ const sectionMeta = {
     description: 'El único lenguaje de programación que funciona en navegadores. Añade interactividad, manipula el DOM y crea aplicaciones dinámicas.',
     color: 'from-yellow-500 to-amber-500',
   },
+  git: {
+    title: 'Git',
+    subtitle: 'Control de versiones',
+    description: 'El sistema de control de versiones que todo desarrollador debe conocer. Gestiona cambios, colabora con otros y mantiene tu historial de código.',
+    color: 'from-red-500 to-orange-500',
+  },
 };
 
 export default function Home() {

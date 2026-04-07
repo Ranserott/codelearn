@@ -9,6 +9,7 @@ const tabs: { id: Language; label: string; color: string }[] = [
   { id: 'html', label: 'HTML', color: 'text-orange-500' },
   { id: 'css', label: 'CSS', color: 'text-blue-500' },
   { id: 'javascript', label: 'JS', color: 'text-yellow-500' },
+  { id: 'git', label: 'Git', color: 'text-red-500' },
 ];
 
 export default function Modal() {
@@ -32,7 +33,7 @@ export default function Modal() {
   const handleClose = () => {
     setSelectedLesson(null);
     setIsEditorOpen(false);
-    setEditedCode({ html: '', css: '', javascript: '' });
+    setEditedCode({ html: '', css: '', javascript: '', git: '' });
   };
 
   const handleOpenEdit = () => {
@@ -45,6 +46,64 @@ export default function Modal() {
   // Build the preview HTML combining HTML, CSS, and JS
   // Only include CSS/JS based on the current module (progressive learning)
   const buildPreview = (code: typeof editedCode) => {
+    // For Git module, show a terminal simulation
+    if (primaryLanguage === 'git') {
+      const gitCode = code.git || selectedLesson.code.git;
+      return `<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0d1117;
+      color: #c9d1d9;
+      font-family: 'JetBrains Mono', 'Fira Code', 'Monaco', monospace;
+      padding: 20px;
+      font-size: 13px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    .terminal-header {
+      background: #161b22;
+      padding: 10px 15px;
+      border-radius: 8px 8px 0 0;
+      margin-bottom: 0;
+    }
+    .terminal-dot {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+    .dot-red { background: #ff5f56; }
+    .dot-yellow { background: #ffbd2e; }
+    .dot-green { background: #27c93f; }
+    .terminal-body {
+      background: #0d1117;
+      padding: 20px;
+      border-radius: 0 0 8px 8px;
+      min-height: 200px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .comment { color: #8b949e; }
+    .command { color: #7ee787; }
+    .output { color: #c9d1d9; }
+    code { font-family: inherit; }
+  </style>
+</head>
+<body>
+  <div class="terminal-header">
+    <span class="terminal-dot dot-red"></span>
+    <span class="terminal-dot dot-yellow"></span>
+    <span class="terminal-dot dot-green"></span>
+  </div>
+  <div class="terminal-body"><code>${gitCode.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')}</code></div>
+</body>
+</html>`;
+    }
+
     const { html, css, javascript } = code;
 
     // Progressive: only include CSS for CSS/JS modules, only include JS for JS module
@@ -86,7 +145,7 @@ export default function Modal() {
 </html>`;
   };
 
-  const currentCode = editedCode.html || editedCode.css || editedCode.javascript
+  const currentCode = editedCode.html || editedCode.css || editedCode.javascript || editedCode.git
     ? editedCode
     : selectedLesson.code;
 
@@ -98,6 +157,7 @@ export default function Modal() {
     html: ['html'],
     css: ['html', 'css'],
     javascript: ['html', 'css', 'javascript'],
+    git: ['git'],
   };
 
   const previewHtml = buildPreview(currentCode);
@@ -117,7 +177,7 @@ export default function Modal() {
 
   // Reset editedCode when switching lessons
   React.useEffect(() => {
-    setEditedCode({ html: '', css: '', javascript: '' });
+    setEditedCode({ html: '', css: '', javascript: '', git: '' });
     setIsFullscreen(false);
   }, [selectedLesson?.id]);
 

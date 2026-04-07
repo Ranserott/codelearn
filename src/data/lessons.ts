@@ -2413,7 +2413,651 @@ app.publica() = \${app.publica()}
 calcularAreaCirculo(5) = \${calcularAreaCirculo(5).toFixed(2)}
 \`;`
     }
+  },
+
+  // Git - Fundamentos
+  {
+    id: 'git-1',
+    title: '1. Crear un repositorio',
+    description: 'Aprende a inicializar un nuevo repositorio Git con git init. Este comando crea un nuevo directorio .git que almacena todo el historial del proyecto.',
+    language: 'git',
+    category: 'fundamentos',
+    code: {
+      html: '',
+      css: '',
+      javascript: '',
+      git: `# Crear un nuevo repositorio en el directorio actual
+git init
+
+# Resultado esperado:
+# Initialized empty Git repository in /ruta/del/proyecto/.git/
+
+# El comando crea una carpeta oculta .git que contiene
+# toda la información del control de versiones`
+    }
+  },
+  {
+    id: 'git-2',
+    title: '2. Clonar un repositorio',
+    description: 'Copia un repositorio existente desde GitHub o cualquier servidor Git. Incluye todo el historial y las ramas.',
+    language: 'git',
+    category: 'fundamentos',
+    code: {
+      html: '',
+      css: '',
+      javascript: '',
+      git: `# Clonar un repositorio completo
+git clone https://github.com/usuario/repositorio.git
+
+# Clonar en una carpeta específica
+git clone https://github.com/usuario/repositorio.git mi-carpeta
+
+# Clonar solo la última versión (más rápido)
+git clone --depth 1 https://github.com/usuario/repositorio.git`
+    }
+  },
+  {
+    id: 'git-3',
+    title: '3. Ver el estado',
+    description: 'El comando git status muestra el estado actual del repositorio: archivos modificados, staged, o sin trackear.',
+    language: 'git',
+    category: 'fundamentos',
+    code: {
+      html: '',
+      css: '',
+      javascript: '',
+      git: `# Ver estado del repositorio
+git status
+
+# Estados posibles:
+# - Changes not staged: archivo modificado pero no en staging
+# - Changes to be committed: archivo en staging listo para commit
+# - Untracked files: archivos nuevos que Git no está siguiendo
+# - Nothing to commit: todo está actualizado`
+    }
+  },
+  {
+    id: 'git-4',
+    title: '4. Agregar archivos',
+    description: ' git add prepara archivos para el commit. Puedes agregar archivos individuales o todos los cambios de una vez.',
+    language: 'git',
+    category: 'fundamentos',
+    code: {
+      html: '',
+      css: '',
+      javascript: '',
+      git: `# Agregar un archivo específico
+git add archivo.txt
+
+# Agregar todos los archivos modificados y nuevos
+git add .
+
+# Agregar todos los archivos con extensión específica
+git add *.js
+
+# Agregar todos los cambios incluyendo eliminaciones
+git add -A
+
+# Agregar interactivamente (preguntando por cada archivo)
+git add -i`
+    }
+  },
+  {
+    id: 'git-5',
+    title: '5. Guardar cambios (commit)',
+    description: 'El commit guarda los cambios staged en el historial del repositorio. Cada commit tiene un hash único que lo identifica.',
+    language: 'git',
+    category: 'fundamentos',
+    code: {
+      html: '',
+      css: '',
+      javascript: '',
+      git: `# Crear un commit con mensaje descriptivo
+git commit -m "Agregar formulario de contacto"
+
+# Crear commit incluyendo archivos trackeados automáticamente
+git commit -am "Fix: corregir bug en login"
+
+# Nota: -am solo funciona con archivos ya trackeados
+
+# Amarrar commit a una fecha específica
+GIT_COMMITTER_DATE="2024-01-01" git commit -m "Commit retroactivo" --date="2024-01-01"`
+    }
+  },
+  {
+    id: 'git-6',
+    title: '6. Configurar usuario',
+    description: 'Configura tu identidad de usuario para los commits. Esta configuración es global para todos los repositorios.',
+    language: 'git',
+    category: 'fundamentos',
+    code: {
+      html: '',
+      css: '',
+      javascript: '',
+      git: `# Configurar nombre de usuario (global)
+git config --global user.name "Tu Nombre"
+
+# Configurar email (global)
+git config --global user.email "tu@email.com"
+
+# Ver configuración actual
+git config --list
+
+# Configurar solo para el repositorio actual (local)
+git config user.name "Tu Nombre"
+git config user.email "tu@email.com"
+
+# Configurar editor padrão
+git config --global core.editor vim`
+    }
+  },
+
+  // Git - Trabajo Diario
+  {
+    id: 'git-7',
+    title: '7. Ver historial',
+    description: 'git log muestra el historial de commits. Puedes filtrar, formatear y buscar en el historial.',
+    language: 'git',
+    category: 'trabajo-diario',
+    code: {
+      html: '',
+      css: '',
+      javascript: '',
+      git: `# Ver historial completo
+git log
+
+# Ver en una línea por commit
+git log --oneline
+
+# Ver últimos 5 commits
+git log -5
+
+# Ver historial con gráficos de ramas
+git log --graph --oneline --all
+
+# Buscar commits por mensaje
+git log --grep="fix:"
+
+# Ver commits de un archivo específico
+git log -- mi-archivo.js`
+    }
+  },
+  {
+    id: 'git-8',
+    title: '8. Ver cambios',
+    description: 'git diff muestra las diferencias entre archivos modificados, commits, ramas o el working directory.',
+    language: 'git',
+    category: 'trabajo-diario',
+    code: {
+      html: '',
+      css: '',
+      javascript: '',
+      git: `# Ver cambios no staged (working directory vs staging)
+git diff
+
+# Ver cambios staged (staging vs último commit)
+git diff --staged
+
+# Ver cambios de un archivo específico
+git diff archivo.txt
+
+# Comparar dos ramas
+git diff rama1..rama2
+
+# Comparar commit actual con anterior
+git diff HEAD~1
+
+# Ver estadísticas de cambios
+git diff --stat`
+    }
+  },
+  {
+    id: 'git-9',
+    title: '9. Descargar cambios (pull)',
+    description: 'git pull descarga cambios del remoto y los integra con tu rama actual. Es la combinación de fetch + merge.',
+    language: 'git',
+    category: 'trabajo-diario',
+    code: {
+      html: '',
+      css: '',
+      javascript: '',
+      git: `# Descargar y fusionar cambios de la rama actual
+git pull
+
+# Descargar de una rama específica
+git pull origin nombre-rama
+
+# Rebase en lugar de merge (historial más limpio)
+git pull --rebase
+
+# Especificar rama upstream
+git pull origin main
+
+# Solo descargar sin fusionar
+git fetch`
+    }
+  },
+  {
+    id: 'git-10',
+    title: '10. Subir cambios (push)',
+    description: 'git push sube tus commits locales al repositorio remoto. Necesitas tener permisos de escritura.',
+    language: 'git',
+    category: 'trabajo-diario',
+    code: {
+      html: '',
+      css: '',
+      javascript: '',
+      git: `# Subir cambios al remoto
+git push
+
+# Especificar remoto y rama
+git push origin main
+
+# Primera vez: establecer upstream
+git push -u origin nombre-rama
+
+# Forzar push (¡cuidado!, sobrescribe el remoto)
+git push --force
+
+# Push todas las ramas
+git push --all
+
+# Eliminar rama del remoto
+git push origin --delete nombre-rama`
+    }
+  },
+  {
+    id: 'git-11',
+    title: '11. Conectar a GitHub',
+    description: 'Configura el remote para conectar tu repositorio local con GitHub u otro servidor Git.',
+    language: 'git',
+    category: 'trabajo-diario',
+    code: {
+      html: '',
+      css: '',
+      javascript: '',
+      git: `# Agregar remoto (origin es el nombre convencional)
+git remote add origin https://github.com/usuario/repo.git
+
+# Ver remotos configurados
+git remote -v
+
+# Cambiar URL del remoto
+git remote set-url origin nueva-url
+
+# Renombrar remoto
+git remote rename origin upstream
+
+# Eliminar remoto
+git remote remove origin`
+    }
+  },
+
+  // Git - Ramas
+  {
+    id: 'git-12',
+    title: '12. Crear ramas',
+    description: 'Las ramas permiten trabajar en características separadas sin afectar el código principal.',
+    language: 'git',
+    category: 'ramas',
+    code: {
+      html: '',
+      css: '',
+      javascript: '',
+      git: `# Crear una nueva rama
+git branch nueva-rama
+
+# Listar todas las ramas (local)
+git branch
+
+# Listar ramas con información
+git branch -v
+
+# Listar ramas remotas
+git branch -r
+
+# Crear y cambiar en un solo paso
+git checkout -b nueva-rama
+
+# Crear rama desde un commit específico
+git branch nueva-rama HEAD~3`
+    }
+  },
+  {
+    id: 'git-13',
+    title: '13. Cambiar de rama',
+    description: 'git checkout y git switch permiten moverse entre ramas. El moderno git switch es más intuitivo.',
+    language: 'git',
+    category: 'ramas',
+    code: {
+      html: '',
+      css: '',
+      javascript: '',
+      git: `# Cambiar a rama existente (forma clásica)
+git checkout nombre-rama
+
+# Cambiar a rama existente (forma moderna)
+git switch nombre-rama
+
+# Crear y cambiar en una sola operación
+git checkout -b nueva-rama
+git switch -c nueva-rama
+
+# Volver a la rama anterior
+git switch -
+
+# Cambiar a commit específico (detached HEAD)
+git checkout abc1234`
+    }
+  },
+  {
+    id: 'git-14',
+    title: '14. Unir ramas (merge)',
+    description: 'git merge combina el historial de dos ramas. Puede crear un commit de merge o hacer fast-forward.',
+    language: 'git',
+    category: 'ramas',
+    code: {
+      html: '',
+      css: '',
+      javascript: '',
+      git: `# Fusionar rama en la rama actual
+git checkout main
+git merge nueva-rama
+
+# Fast-forward (sin commit de merge)
+git merge nueva-rama
+
+# Merge con mensaje personalizado
+git merge nueva-rama -m "Merge feature/login"
+
+# Abortar un merge en progreso
+git merge --abort
+
+# Ver ramas que han sido fusionadas
+git branch --merged`
+    }
+  },
+  {
+    id: 'git-15',
+    title: '15. Eliminar ramas',
+    description: 'Elimina ramas que ya no necesitas. La rama debe estar fusionada o usar --force.',
+    language: 'git',
+    category: 'ramas',
+    code: {
+      html: '',
+      css: '',
+      javascript: '',
+      git: `# Eliminar rama local (si está fusionada)
+git branch -d nombre-rama
+
+# Forzar eliminación (aunque no esté fusionada)
+git branch -D nombre-rama
+
+# Eliminar rama remota
+git push origin --delete nombre-rama
+
+# Ver ramas no fusionadas
+git branch --no-merged`
+    }
+  },
+
+  // Git - Deshacer Errores
+  {
+    id: 'git-16',
+    title: '16. Quitar del staging',
+    description: 'Si agregaste archivos por error al staging, puedes quitarlos sin perder los cambios.',
+    language: 'git',
+    category: 'deshacer',
+    code: {
+      html: '',
+      css: '',
+      javascript: '',
+      git: `# Quitar un archivo del staging
+git restore --staged archivo.txt
+
+# Quitar todos los archivos del staging
+git restore --staged .
+
+# Forma antigua ( aún funciona)
+git reset HEAD archivo.txt
+
+# Ver estado después de quitar del staging
+git status`
+    }
+  },
+  {
+    id: 'git-17',
+    title: '17. Deshacer cambios',
+    description: 'Restaura un archivo a su estado del último commit. CUIDADO: perderás los cambios no guardados.',
+    language: 'git',
+    category: 'deshacer',
+    code: {
+      html: '',
+      css: '',
+      javascript: '',
+      git: `# Deshacer cambios en un archivo
+git restore archivo.txt
+
+# Deshacer todos los cambios
+git restore .
+
+# Forma antigua
+git checkout -- archivo.txt
+
+# Deshacer cambios en archivos staged
+git restore --staged archivo.txt
+git restore archivo.txt
+
+# Ver qué archivos cambiarán
+git restore --diff`
+    }
+  },
+  {
+    id: 'git-18',
+    title: '18. Volver a commit anterior',
+    description: 'git reset mueve la cabeza del repositorio hacia un commit anterior. Hay tres modos: soft, mixed, hard.',
+    language: 'git',
+    category: 'deshacer',
+    code: {
+      html: '',
+      css: '',
+      javascript: '',
+      git: `# Soft: mantener cambios en staging
+git reset --soft HEAD~1
+
+# Mixed (default): mantener cambios en working directory
+git reset HEAD~1
+
+# Hard: BORRAR todos los cambios (¡irreversible!)
+git reset --hard HEAD~1
+
+# Volver a un commit específico
+git reset --hard abc1234
+
+# Ver historial después del reset
+git log --oneline`
+    }
+  },
+  {
+    id: 'git-19',
+    title: '19. Revertir un commit',
+    description: 'git revert crea un nuevo commit que deshace los cambios de un commit anterior. Es seguro para trabajo compartido.',
+    language: 'git',
+    category: 'deshacer',
+    code: {
+      html: '',
+      css: '',
+      javascript: '',
+      git: `# Revertir el último commit
+git revert HEAD
+
+# Revertir un commit específico
+git revert abc1234
+
+# Revertir sin crear commit automáticamente
+git revert --no-commit abc1234
+
+# Ver qué revertirá antes de hacerlo
+git revert --no-commit HEAD~3..HEAD
+
+# Después de preparar todos los revert, commit
+git commit -m "Revert commits X, Y, Z"`
+    }
+  },
+
+  // Git - GitHub
+  {
+    id: 'git-20',
+    title: '20. Primer push a GitHub',
+    description: 'Pasos completos para subir tu proyecto local a GitHub por primera vez.',
+    language: 'git',
+    category: 'github',
+    code: {
+      html: '',
+      css: '',
+      javascript: '',
+      git: `# 1. Crear repositorio en GitHub (web)
+
+# 2. Inicializar git en tu proyecto
+git init
+
+# 3. Agregar archivos
+git add .
+
+# 4. Hacer primer commit
+git commit -m "Primer commit"
+
+# 5. Conectar con GitHub
+git remote add origin https://github.com/usuario/repo.git
+
+# 6. Subir (establecer upstream)
+git push -u origin main`
+    }
+  },
+  {
+    id: 'git-21',
+    title: '21. Trabajar con ramas remotas',
+    description: 'Aprende a descargar, crear y subir ramas que existen en el repositorio remoto.',
+    language: 'git',
+    category: 'github',
+    code: {
+      html: '',
+      css: '',
+      javascript: '',
+      git: `# Descargar una rama remota
+git fetch origin
+git checkout nombre-rama
+
+# Traer cambios de una rama específica
+git pull origin nombre-rama
+
+# Crear rama local basada en remota
+git checkout -b nueva-rama origin/nueva-rama
+
+# Subir nueva rama al remoto
+git push origin nombre-rama
+
+# Ver todas las ramas (local y remota)
+git branch -a`
+    }
+  },
+  {
+    id: 'git-22',
+    title: '22. Git pull vs git fetch',
+    description: 'Entiende la diferencia entre estos dos comandos y cuándo usar cada uno.',
+    language: 'git',
+    category: 'github',
+    code: {
+      html: '',
+      css: '',
+      javascript: '',
+      git: `# git fetch: solo descarga referencias, NO fusiona
+git fetch origin
+# Ahora puedes ver los cambios sin afectartu código
+
+# git pull: descarga Y fusiona automáticamente
+git pull origin main
+# Equivalente a: git fetch + git merge
+
+# Fetch + merge manual (más control)
+git fetch origin
+git log --oneline origin/main
+git diff main..origin/main
+git merge origin/main`
+    }
+  },
+  {
+    id: 'git-23',
+    title: '23. Alias útiles',
+    description: 'Crea atajos para los comandos más usados y optimiza tu flujo de trabajo.',
+    language: 'git',
+    category: 'github',
+    code: {
+      html: '',
+      css: '',
+      javascript: '',
+      git: `# Alias para comando corto
+git config --global alias.co checkout
+git config --global alias.br branch
+git config --global alias.st status
+git config --global alias.cm "commit -m"
+
+# Alias para ver historial simplificado
+git config --global alias.lg "log --oneline --graph --all"
+
+# Usar alias
+git co main
+git st
+git cm "Fix bug"
+git lg
+
+# Alias temporales (sin guardar)
+git log --oneline -10
+git stash list`
+    }
+  },
+  {
+    id: 'git-24',
+    title: '24. Stash: guardar cambios temporalmente',
+    description: 'Guarda cambios no comprometidos temporalmente para cambiar de rama o aplicar otros cambios.',
+    language: 'git',
+    category: 'github',
+    code: {
+      html: '',
+      css: '',
+      javascript: '',
+      git: `# Guardar cambios temporalmente
+git stash
+
+# Guardar con mensaje descriptivo
+git stash push -m "Trabajo en progreso"
+
+# Ver lista de stash
+git stash list
+
+# Aplicar último stash (mantener en lista)
+git stash apply
+
+# Aplicar último stash (eliminar de lista)
+git stash pop
+
+# Aplicar stash específico
+git stash apply stash@{2}
+
+# Eliminar stash
+git stash drop stash@{0}
+
+# Limpiar todos los stash
+git stash clear`
+    }
   }
 ];
 
-export const categories = ['introduccion', 'estructura', 'titulos', 'parrafos', 'saltos', 'formato', 'contenedores', 'listas', 'imagenes', 'videos', 'enlaces', 'navegacion', 'formularios', 'inputs', 'semantico', 'estructura-completa', 'buenas-practicas'];
+export const categories = [
+  // HTML/CSS/JS
+  'introduccion', 'estructura', 'titulos', 'parrafos', 'saltos', 'formato',
+  'contenedores', 'listas', 'imagenes', 'videos', 'enlaces', 'navegacion',
+  'formularios', 'inputs', 'semantico', 'estructura-completa', 'buenas-practicas',
+  // Git
+  'fundamentos', 'trabajo-diario', 'ramas', 'deshacer', 'github'
+];

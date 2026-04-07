@@ -1,9 +1,10 @@
-export type Language = 'html' | 'css' | 'javascript';
+export type Language = 'html' | 'css' | 'javascript' | 'git';
 
 export interface LessonCode {
   html: string;
   css: string;
   javascript: string;
+  git: string;
 }
 
 export interface Lesson {

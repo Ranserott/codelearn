@@ -32,7 +32,7 @@ export const useAppStore = create<AppState>((set) => ({
   isEditorOpen: false,
   setIsEditorOpen: (isOpen) => set({ isEditorOpen: isOpen }),
 
-  editedCode: { html: '', css: '', javascript: '' },
+  editedCode: { html: '', css: '', javascript: '', git: '' },
   setEditedCodeField: (field, value) =>
     set((state) => ({ editedCode: { ...state.editedCode, [field]: value } })),
   setEditedCode: (code) => set({ editedCode: code }),
