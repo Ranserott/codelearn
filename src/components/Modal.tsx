@@ -48,7 +48,7 @@ export default function Modal() {
   const buildPreview = (code: typeof editedCode) => {
     // For Git module, show a terminal simulation
     if (primaryLanguage === 'git') {
-      const gitCode = code.git || selectedLesson.code.git;
+      const gitCode = code.git || selectedLesson.code.git || '';
       return `<!DOCTYPE html>
 <html>
 <head>
