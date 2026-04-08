@@ -46,9 +46,18 @@ export default function Modal() {
   // Build the preview HTML combining HTML, CSS, and JS
   // Only include CSS/JS based on the current module (progressive learning)
   const buildPreview = (code: typeof editedCode) => {
-    // For Git module, show a terminal simulation
+    // For Git module, show a terminal simulation with colored syntax
     if (primaryLanguage === 'git') {
       const gitCode = code.git || selectedLesson.code.git || '';
+      // Colorize git code: comments (green), commands (yellow), output (gray)
+      const colorized = gitCode
+        .replace(/^(#.*)$/gm, '<span style="color:#7ee787">$1</span>')
+        .replace(/^(git\s+\w+)/gm, '<span style="color:#ff7b72">$1</span>')
+        .replace(/^(https?:\/\/[^\s]+)/gm, '<span style="color:#79c0ff">$1</span>')
+        .replace(/\b(main|master|HEAD|origin)\b/g, '<span style="color:#d2a8ff">$1</span>')
+        .replace(/^(-{2,}[a-zA-Z]+)/gm, '<span style="color:#79c0ff">$1</span>')
+        .replace(/\bfalse\b|\btrue\b/g, '<span style="color:#79c0ff">$&</span>');
+
       return `<!DOCTYPE html>
 <html>
 <head>
@@ -67,14 +76,20 @@ export default function Modal() {
       background: #161b22;
       padding: 10px 15px;
       border-radius: 8px 8px 0 0;
-      margin-bottom: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .terminal-title {
+      color: #8b949e;
+      font-size: 12px;
+      margin-left: 8px;
     }
     .terminal-dot {
       display: inline-block;
       width: 12px;
       height: 12px;
       border-radius: 50%;
-      margin-right: 8px;
     }
     .dot-red { background: #ff5f56; }
     .dot-yellow { background: #ffbd2e; }
@@ -84,13 +99,11 @@ export default function Modal() {
       padding: 20px;
       border-radius: 0 0 8px 8px;
       min-height: 200px;
-      white-space: pre-wrap;
-      word-break: break-word;
     }
-    .comment { color: #8b949e; }
-    .command { color: #7ee787; }
-    .output { color: #c9d1d9; }
-    code { font-family: inherit; }
+    .comment { color: #7ee787; }
+    .command { color: #ff7b72; }
+    .url { color: #79c0ff; }
+    .branch { color: #d2a8ff; }
   </style>
 </head>
 <body>
@@ -98,8 +111,9 @@ export default function Modal() {
     <span class="terminal-dot dot-red"></span>
     <span class="terminal-dot dot-yellow"></span>
     <span class="terminal-dot dot-green"></span>
+    <span class="terminal-title">terminal</span>
   </div>
-  <div class="terminal-body"><code>${gitCode.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>')}</code></div>
+  <div class="terminal-body">${colorized.split('\n').join('<br>')}</div>
 </body>
 </html>`;
     }
@@ -158,6 +172,67 @@ export default function Modal() {
     css: ['html', 'css'],
     javascript: ['html', 'css', 'javascript'],
     git: ['git'],
+  };
+
+  // Git demo commands for animated preview
+  const getGitDemoCommand = (lessonId: string | undefined) => {
+    const demos: Record<string, string> = {
+      'git-1': 'git init',
+      'git-2': 'git clone https://github.com/user/repo.git',
+      'git-3': 'git status',
+      'git-4': 'git add .',
+      'git-5': 'git commit -m "Initial commit"',
+      'git-6': 'git config --global user.name "User"',
+      'git-7': 'git log --oneline',
+      'git-8': 'git diff',
+      'git-9': 'git pull origin main',
+      'git-10': 'git push -u origin main',
+      'git-11': 'git remote add origin https://github.com/user/repo.git',
+      'git-12': 'git branch feature/login',
+      'git-13': 'git checkout feature/login',
+      'git-14': 'git merge feature/login',
+      'git-15': 'git branch -d feature/login',
+      'git-16': 'git restore --staged file.txt',
+      'git-17': 'git restore file.txt',
+      'git-18': 'git reset --hard HEAD~1',
+      'git-19': 'git revert abc1234',
+      'git-20': 'git push -u origin main',
+      'git-21': 'git pull origin feature/login',
+      'git-22': 'git fetch origin',
+      'git-23': 'git config --global alias.lg log --oneline',
+      'git-24': 'git stash',
+    };
+    return demos[lessonId || ''] || 'git command';
+  };
+
+  const getGitDemoOutput = (lessonId: string | undefined) => {
+    const outputs: Record<string, string> = {
+      'git-1': 'Initialized empty Git repository in /path/.git/',
+      'git-2': 'Cloning into "repo"...\nremote: Enumerating objects: 100\nReceiving objects: 100%',
+      'git-3': 'On branch main\nYour branch is up to date with "origin/main".',
+      'git-4': 'Changes to be committed:\n  modified:   src/app.tsx',
+      'git-5': '[main abc1234] Initial commit\n 1 file changed, 50 insertions(+)',
+      'git-6': 'Username configured successfully',
+      'git-7': 'abc1234 (HEAD -> main) Initial commit',
+      'git-8': 'diff --git a/src/app.tsx b/src/app.tsx\n--- a/src/app.tsx\n+++ b/src/app.tsx',
+      'git-9': 'Updating abc1234..def5678\nFast-forward',
+      'git-10': 'Enumerating objects: 5, done.\nCounting objects: 100%',
+      'git-11': 'Repository URL associated with "origin"',
+      'git-12': 'Created branch feature/login',
+      'git-13': 'Switched to branch "feature/login"',
+      'git-14': 'Merge made by the "ort" strategy.',
+      'git-15': 'Deleted branch feature/login (was abc1234).',
+      'git-16': '',
+      'git-17': '',
+      'git-18': 'HEAD is now at abc1234 Previous commit',
+      'git-19': '[main def5678] Revert "Add feature"',
+      'git-20': 'Branch "main" set up to track "origin/main"',
+      'git-21': 'Updating abc1234..def5678',
+      'git-22': 'Fetching origin',
+      'git-23': '',
+      'git-24': 'Saved working directory and index state WIP on main',
+    };
+    return outputs[lessonId || ''] || '';
   };
 
   const previewHtml = buildPreview(currentCode);
@@ -337,7 +412,42 @@ export default function Modal() {
               )}
 
               {/* Right side: Code + tabs - hidden in fullscreen */}
-              {!isFullscreen && (
+              {!isFullscreen && primaryLanguage === 'git' && (
+                <div className="flex-1 flex flex-col overflow-hidden">
+                  {/* Git preview - animated terminal demo */}
+                  <div
+                    className={`px-4 py-3 border-b shrink-0 flex items-center justify-between ${
+                      darkMode ? 'border-[#1a1a20] bg-[#0c0c0e]' : 'border-gray-200 bg-white'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <svg className="w-4 h-4 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                      <span className={`text-xs font-medium ${darkMode ? 'text-[#666]' : 'text-gray-500'}`}>
+                        Demo animado
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex-1 overflow-hidden p-3 bg-[#0d1117]">
+                    <div className="h-full rounded-xl overflow-hidden bg-[#161b22] border border-[#30363d]">
+                      <div className="bg-[#1c2128] px-4 py-2 flex items-center gap-2 border-b border-[#30363d]">
+                        <span className="w-3 h-3 rounded-full bg-red-500"></span>
+                        <span className="w-3 h-3 rounded-full bg-yellow-500"></span>
+                        <span className="w-3 h-3 rounded-full bg-green-500"></span>
+                        <span className="ml-2 text-xs text-[#8b949e]">bash</span>
+                      </div>
+                      <div className="p-4 font-mono text-sm">
+                        <div className="text-[#7ee787] animate-pulse">$ {getGitDemoCommand(selectedLesson.id)}</div>
+                        <div className="mt-2 text-[#8b949e] text-xs">{getGitDemoOutput(selectedLesson.id)}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Right side: Code + tabs - for non-git lessons */}
+              {!isFullscreen && primaryLanguage !== 'git' && (
                 <div className="flex-1 flex flex-col overflow-hidden">
                   {/* Tabs */}
                   <div
@@ -414,7 +524,6 @@ export default function Modal() {
                   )}
                 </div>
               </div>
-              )}
             </div>
           </div>
         ) : (
