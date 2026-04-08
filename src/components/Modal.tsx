@@ -3,7 +3,7 @@
 import { useAppStore } from '@/store/useAppStore';
 import { Highlight, themes } from 'prism-react-renderer';
 import { Language } from '@/types';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const tabs: { id: Language; label: string; color: string }[] = [
   { id: 'html', label: 'HTML', color: 'text-orange-500' },
@@ -11,6 +11,43 @@ const tabs: { id: Language; label: string; color: string }[] = [
   { id: 'javascript', label: 'JS', color: 'text-yellow-500' },
   { id: 'git', label: 'Git', color: 'text-red-500' },
 ];
+
+function colorizeGitCode(code: string): string {
+  const lines = code.split('\n');
+  return lines.map(line => {
+    // Comments (green)
+    if (line.trim().startsWith('#')) {
+      return `<span style="color:#7ee787">${escapeHtml(line)}</span>`;
+    }
+    // Git commands (red)
+    const gitCommandMatch = line.match(/^(git\s+\w+)/);
+    if (gitCommandMatch) {
+      const prefix = line.substring(0, gitCommandMatch[0].length);
+      const rest = line.substring(gitCommandMatch[0].length);
+      return `<span style="color:#ff7b72">${escapeHtml(prefix)}</span>${escapeHtml(rest)}`;
+    }
+    // URLs (blue)
+    if (line.includes('http://') || line.includes('https://')) {
+      return line.replace(
+        /(https?:\/\/[^\s]+)/g,
+        '<span style="color:#79c0ff">$1</span>'
+      );
+    }
+    // Branch names (purple)
+    line = line.replace(
+      /\b(main|master|HEAD|origin)\b/g,
+      '<span style="color:#d2a8ff">$1</span>'
+    );
+    return escapeHtml(line);
+  }).join('<br>');
+}
+
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
 
 export default function Modal() {
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -38,25 +75,16 @@ export default function Modal() {
 
   const handleOpenEdit = () => {
     setEditedCode(selectedLesson.code);
-    // Set active tab to the primary language of the lesson
     setActiveTab(selectedLesson.language);
     setIsEditorOpen(true);
   };
 
-  // Build the preview HTML combining HTML, CSS, and JS
-  // Only include CSS/JS based on the current module (progressive learning)
   const buildPreview = (code: typeof editedCode) => {
-    // For Git module, show a terminal simulation with colored syntax
+    const primaryLanguage = selectedLesson.language;
+
     if (primaryLanguage === 'git') {
       const gitCode = code.git || selectedLesson.code.git || '';
-      // Colorize git code: comments (green), commands (yellow), output (gray)
-      const colorized = gitCode
-        .replace(/^(#.*)$/gm, '<span style="color:#7ee787">$1</span>')
-        .replace(/^(git\s+\w+)/gm, '<span style="color:#ff7b72">$1</span>')
-        .replace(/^(https?:\/\/[^\s]+)/gm, '<span style="color:#79c0ff">$1</span>')
-        .replace(/\b(main|master|HEAD|origin)\b/g, '<span style="color:#d2a8ff">$1</span>')
-        .replace(/^(-{2,}[a-zA-Z]+)/gm, '<span style="color:#79c0ff">$1</span>')
-        .replace(/\bfalse\b|\btrue\b/g, '<span style="color:#79c0ff">$&</span>');
+      const colorized = colorizeGitCode(gitCode);
 
       return `<!DOCTYPE html>
 <html>
@@ -100,10 +128,6 @@ export default function Modal() {
       border-radius: 0 0 8px 8px;
       min-height: 200px;
     }
-    .comment { color: #7ee787; }
-    .command { color: #ff7b72; }
-    .url { color: #79c0ff; }
-    .branch { color: #d2a8ff; }
   </style>
 </head>
 <body>
@@ -113,25 +137,21 @@ export default function Modal() {
     <span class="terminal-dot dot-green"></span>
     <span class="terminal-title">terminal</span>
   </div>
-  <div class="terminal-body">${colorized.split('\n').join('<br>')}</div>
+  <div class="terminal-body">${colorized}</div>
 </body>
 </html>`;
     }
 
     const { html, css, javascript } = code;
-
-    // Progressive: only include CSS for CSS/JS modules, only include JS for JS module
     const shouldIncludeCSS = primaryLanguage !== 'html';
     const shouldIncludeJS = primaryLanguage === 'javascript';
 
     const cssToInclude = shouldIncludeCSS ? css : '';
     const jsToInclude = shouldIncludeJS ? javascript : '';
 
-    // Check if HTML is a complete document or a fragment
     const isCompleteDocument = html.includes('<html') || html.includes('<!DOCTYPE');
 
     if (isCompleteDocument) {
-      // HTML already has structure - inject CSS and JS into it
       let fullHtml = html;
 
       if (cssToInclude && !html.includes('<style>')) {
@@ -143,7 +163,6 @@ export default function Modal() {
       return fullHtml;
     }
 
-    // HTML is a fragment - wrap it in a complete document
     const cssBlock = cssToInclude ? `\n<style>\n${cssToInclude}\n</style>` : '';
     const jsBlock = jsToInclude ? `\n<script>\n${jsToInclude}\n</script>` : '';
 
@@ -163,10 +182,8 @@ export default function Modal() {
     ? editedCode
     : selectedLesson.code;
 
-  // Get the language that should be shown first (based on which module we're in)
   const primaryLanguage = selectedLesson.language;
 
-  // Define which tabs should be shown based on the module (progressive learning)
   const tabsOrder: Record<Language, Language[]> = {
     html: ['html'],
     css: ['html', 'css'],
@@ -174,8 +191,7 @@ export default function Modal() {
     git: ['git'],
   };
 
-  // Git demo commands for animated preview
-  const getGitDemoCommand = (lessonId: string | undefined) => {
+  const getGitDemoCommand = (lessonId: string | undefined): string => {
     const demos: Record<string, string> = {
       'git-1': 'git init',
       'git-2': 'git clone https://github.com/user/repo.git',
@@ -205,7 +221,7 @@ export default function Modal() {
     return demos[lessonId || ''] || 'git command';
   };
 
-  const getGitDemoOutput = (lessonId: string | undefined) => {
+  const getGitDemoOutput = (lessonId: string | undefined): string => {
     const outputs: Record<string, string> = {
       'git-1': 'Initialized empty Git repository in /path/.git/',
       'git-2': 'Cloning into "repo"...\nremote: Enumerating objects: 100\nReceiving objects: 100%',
@@ -237,34 +253,27 @@ export default function Modal() {
 
   const previewHtml = buildPreview(currentCode);
 
-  // Only show tabs based on the module's progressive level
   const availableTabs = tabs.filter(tab => tabsOrder[primaryLanguage].includes(tab.id));
-
-  // Default to the primary language tab
   const defaultTab = availableTabs.find(tab => tab.id === primaryLanguage) || availableTabs[0];
 
-  // Set initial tab when modal opens
-  React.useEffect(() => {
+  useEffect(() => {
     if (defaultTab && !isEditorOpen) {
       setActiveTab(defaultTab.id);
     }
-  }, []);
+  }, [defaultTab, isEditorOpen, setActiveTab]);
 
-  // Reset editedCode when switching lessons
-  React.useEffect(() => {
+  useEffect(() => {
     setEditedCode({ html: '', css: '', javascript: '', git: undefined });
     setIsFullscreen(false);
-  }, [selectedLesson?.id]);
+  }, [selectedLesson?.id, setEditedCode]);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
       <div
         className="absolute inset-0 bg-black/70 backdrop-blur-sm"
         onClick={handleClose}
       />
 
-      {/* Modal */}
       <div
         className={`relative w-full rounded-2xl overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-200 ${
           isFullscreen
@@ -277,7 +286,6 @@ export default function Modal() {
       >
         {!isEditorOpen ? (
           <div className={`flex flex-col ${isFullscreen ? 'h-full' : 'h-full max-h-[92vh]'}`}>
-            {/* Header */}
             <header
               className={`flex items-center justify-between px-6 py-4 border-b shrink-0 ${
                 darkMode ? 'border-[#1a1a20]' : 'border-gray-100'
@@ -324,9 +332,7 @@ export default function Modal() {
               </div>
             </header>
 
-            {/* Main content area */}
             <div className={`flex flex-1 overflow-hidden ${isFullscreen ? 'flex-col' : ''}`}>
-              {/* Fullscreen Preview */}
               {isFullscreen ? (
                 <div className="flex-1 flex flex-col relative">
                   <div
@@ -367,7 +373,6 @@ export default function Modal() {
                 </div>
               ) : (
                 <>
-                  {/* Left side: Preview */}
                   <div
                     className={`w-1/2 border-r shrink-0 flex flex-col ${
                       darkMode ? 'border-[#1a1a20] bg-[#08080a]' : 'border-gray-200 bg-gray-50'
@@ -411,10 +416,8 @@ export default function Modal() {
                 </>
               )}
 
-              {/* Right side: Code + tabs - hidden in fullscreen */}
               {!isFullscreen && primaryLanguage === 'git' && (
                 <div className="flex-1 flex flex-col overflow-hidden">
-                  {/* Git preview - animated terminal demo */}
                   <div
                     className={`px-4 py-3 border-b shrink-0 flex items-center justify-between ${
                       darkMode ? 'border-[#1a1a20] bg-[#0c0c0e]' : 'border-gray-200 bg-white'
@@ -446,90 +449,84 @@ export default function Modal() {
                 </div>
               )}
 
-              {/* Right side: Code + tabs - for non-git lessons */}
               {!isFullscreen && primaryLanguage !== 'git' && (
                 <div className="flex-1 flex flex-col overflow-hidden">
-                  {/* Tabs */}
                   <div
                     className={`flex border-b shrink-0 ${
                       darkMode ? 'border-[#1a1a20] bg-[#0c0c0e]' : 'border-gray-200 bg-white'
                     }`}
                   >
                     {availableTabs.map((tab) => {
-                    const isActive = activeTab === tab.id;
+                      const isActive = activeTab === tab.id;
 
-                    return (
-                      <button
-                        key={tab.id}
-                        onClick={() => setActiveTab(tab.id)}
-                        className={`flex-1 px-4 py-3 text-sm font-medium transition-colors relative ${
-                          isActive
-                            ? darkMode ? 'text-white bg-[#111115]' : 'text-gray-900 bg-white'
-                            : darkMode
-                            ? 'text-[#666] hover:text-[#aaa]'
-                            : 'text-gray-500 hover:text-gray-700'
+                      return (
+                        <button
+                          key={tab.id}
+                          onClick={() => setActiveTab(tab.id)}
+                          className={`flex-1 px-4 py-3 text-sm font-medium transition-colors relative ${
+                            isActive
+                              ? darkMode ? 'text-white bg-[#111115]' : 'text-gray-900 bg-white'
+                              : darkMode
+                              ? 'text-[#666] hover:text-[#aaa]'
+                              : 'text-gray-500 hover:text-gray-700'
+                          }`}
+                        >
+                          <span className={tab.color}>{tab.label}</span>
+                          {isActive && (
+                            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#f59e0b]" />
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div className="flex-1 overflow-auto p-4">
+                    <p className={`text-sm leading-relaxed mb-4 ${darkMode ? 'text-[#777]' : 'text-gray-600'}`}>
+                      {selectedLesson.description}
+                    </p>
+
+                    {currentCode[activeTab] && (
+                      <div
+                        className={`rounded-xl overflow-hidden border ${
+                          darkMode ? 'border-[#1a1a20]' : 'border-gray-200'
                         }`}
                       >
-                        <span className={tab.color}>{tab.label}</span>
-                        {isActive && (
-                          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#f59e0b]" />
-                        )}
-                      </button>
-                    );
-                  })}
+                        <Highlight
+                          theme={darkMode ? themes.nightOwl : themes.github}
+                          code={currentCode[activeTab].trim()}
+                          language={activeTab === 'javascript' ? 'javascript' : activeTab === 'css' ? 'css' : 'markup'}
+                        >
+                          {({ style, tokens, getLineProps, getTokenProps }) => (
+                            <pre
+                              className="p-4 overflow-x-auto text-sm max-h-80"
+                              style={{ ...style, background: darkMode ? '#111115' : '#f6f8fa' }}
+                            >
+                              {tokens.map((line, i) => (
+                                <div key={i} {...getLineProps({ line })}>
+                                  <span
+                                    className={`inline-block w-8 text-right mr-4 select-none text-xs ${
+                                      darkMode ? 'text-[#3a3a45]' : 'text-gray-300'
+                                    }`}
+                                  >
+                                    {i + 1}
+                                  </span>
+                                  {line.map((token, key) => (
+                                    <span key={key} {...getTokenProps({ token })} />
+                                  ))}
+                                </div>
+                              ))}
+                            </pre>
+                          )}
+                        </Highlight>
+                      </div>
+                    )}
+                  </div>
                 </div>
-
-                {/* Code display */}
-                <div className="flex-1 overflow-auto p-4">
-                  {/* Description */}
-                  <p className={`text-sm leading-relaxed mb-4 ${darkMode ? 'text-[#777]' : 'text-gray-600'}`}>
-                    {selectedLesson.description}
-                  </p>
-
-                  {/* Code block */}
-                  {currentCode[activeTab] && (
-                    <div
-                      className={`rounded-xl overflow-hidden border ${
-                        darkMode ? 'border-[#1a1a20]' : 'border-gray-200'
-                      }`}
-                    >
-                      <Highlight
-                        theme={darkMode ? themes.nightOwl : themes.github}
-                        code={currentCode[activeTab].trim()}
-                        language={activeTab === 'javascript' ? 'javascript' : activeTab === 'css' ? 'css' : 'markup'}
-                      >
-                        {({ style, tokens, getLineProps, getTokenProps }) => (
-                          <pre
-                            className="p-4 overflow-x-auto text-sm max-h-80"
-                            style={{ ...style, background: darkMode ? '#111115' : '#f6f8fa' }}
-                          >
-                            {tokens.map((line, i) => (
-                              <div key={i} {...getLineProps({ line })}>
-                                <span
-                                  className={`inline-block w-8 text-right mr-4 select-none text-xs ${
-                                    darkMode ? 'text-[#3a3a45]' : 'text-gray-300'
-                                  }`}
-                                >
-                                  {i + 1}
-                                </span>
-                                {line.map((token, key) => (
-                                  <span key={key} {...getTokenProps({ token })} />
-                                ))}
-                              </div>
-                            ))}
-                          </pre>
-                        )}
-                      </Highlight>
-                    </div>
-                  )}
-                </div>
-              </div>
+              )}
             </div>
           </div>
         ) : (
-          /* Editor Mode */
           <div className="flex flex-col h-full max-h-[92vh]">
-            {/* Editor Header */}
             <header
               className={`flex items-center justify-between px-6 py-4 border-b shrink-0 ${
                 darkMode ? 'border-[#1a1a20]' : 'border-gray-100'
@@ -556,11 +553,8 @@ export default function Modal() {
               </button>
             </header>
 
-            {/* Editor body: split view */}
             <div className="flex flex-1 overflow-hidden">
-              {/* Code editor */}
               <div className={`flex-1 flex flex-col ${darkMode ? 'bg-[#0a0a0e]' : 'bg-gray-50'}`}>
-                {/* Tabs for editing */}
                 <div className={`flex border-b ${darkMode ? 'border-[#1a1a20] bg-[#0c0c0e]' : 'border-gray-200 bg-white'}`}>
                   {availableTabs.map((tab) => {
                     const isActive = activeTab === tab.id;
@@ -586,7 +580,6 @@ export default function Modal() {
                   })}
                 </div>
 
-                {/* Textarea */}
                 <div className="flex-1 p-4 overflow-auto">
                   <textarea
                     value={currentCode[activeTab] || ''}
@@ -603,7 +596,6 @@ export default function Modal() {
                 </div>
               </div>
 
-              {/* Preview */}
               <div
                 className={`w-1/2 flex flex-col border-l ${
                   darkMode ? 'border-[#1a1a20] bg-[#08080a]' : 'border-gray-200 bg-gray-50'
@@ -640,6 +632,3 @@ export default function Modal() {
     </div>
   );
 }
-
-// Need to import React for useEffect
-import React from 'react';
