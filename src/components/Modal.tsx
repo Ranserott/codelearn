@@ -10,6 +10,8 @@ const tabs: { id: Language; label: string; color: string }[] = [
   { id: 'css', label: 'CSS', color: 'text-blue-500' },
   { id: 'javascript', label: 'JS', color: 'text-yellow-500' },
   { id: 'git', label: 'Git', color: 'text-red-500' },
+  { id: 'nodejs', label: 'Node.js', color: 'text-cyan-500' },
+  { id: 'express', label: 'Express', color: 'text-green-500' },
 ];
 
 function colorizeGitCode(code: string): string {
@@ -47,6 +49,508 @@ function escapeHtml(text: string): string {
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
+}
+
+// Build flow diagram preview for Node.js and Express lessons
+function buildFlowPreview(language: Language, jsCode: string, lessonId: string): string {
+  if (language === 'nodejs') {
+    return buildNodejsFlowPreview(jsCode, lessonId);
+  }
+  return buildExpressFlowPreview(jsCode, lessonId);
+}
+
+// Custom flows per lesson ID
+const nodejsFlows: Record<string, { title: string; steps: { title: string; desc: string }[] }> = {
+  'nodejs-3': {
+    title: 'Event Loop',
+    steps: [
+      { title: '1. Call Stack', desc: 'Código síncrono se ejecuta primero. Solo un hilo (V8).' },
+      { title: '2. Node APIs', desc: 'setTimeout, fs.readFile, HTTP requests... operaciones asíncronas.' },
+      { title: '3. Callback Queue', desc: 'Cuando las APIs terminan, los callbacks esperan su turno.' },
+      { title: '4. Event Loop', desc: 'El loop verifica si el Call Stack está vacío para ejecutar callbacks.' },
+    ]
+  },
+  'nodejs-4': {
+    title: 'Callbacks',
+    steps: [
+      { title: '1. Función como argumento', desc: 'Pasamos una función (callback) a otra función.' },
+      { title: '2. Operación async', desc: 'La función inicia una operación que toma tiempo.' },
+      { title: '3. Espera', desc: 'El callback se queda esperando en la Callback Queue.' },
+      { title: '4. Callback ejecutado', desc: 'Cuando termina, el Event Loop lo pasa al Call Stack.' },
+    ]
+  },
+  'nodejs-5': {
+    title: 'Promesas',
+    steps: [
+      { title: '1. Promise creada', desc: 'new Promise((resolve, reject) => {...})' },
+      { title: '2. Estado pending', desc: 'La promesa queda en espera mientras opera.' },
+      { title: '3. resolve() o reject()', desc: 'Termina exitosamente o con error.' },
+      { title: '4. .then() o .catch()', desc: 'Se ejecutan los handlers según el resultado.' },
+    ]
+  },
+  'nodejs-6': {
+    title: 'Async/Await',
+    steps: [
+      { title: '1. async function', desc: 'Función que devuelve una Promesa implícitamente.' },
+      { title: '2. await', desc: 'Pausa la ejecución hasta que la Promesa se resuelva.' },
+      { title: '3. Ejecución suspendida', desc: 'Mientras espera, otras cosas pueden ejecutarse.' },
+      { title: '4. Resultado disponible', desc: 'El valor se asigna a la variable cuando está listo.' },
+    ]
+  },
+  'nodejs-7': {
+    title: 'CommonJS Modules',
+    steps: [
+      { title: '1. module.exports', desc: 'Se exporta lo que el módulo quiere exponer.' },
+      { title: '2. require()', desc: 'Se importa el módulo en otro archivo.' },
+      { title: '3. Caché del módulo', desc: 'Node.js cachea el módulo (se ejecuta una vez).' },
+      { title: '4. Objeto exportado', desc: 'Lo que se exportó está disponible en la variable.' },
+    ]
+  },
+  'nodejs-9': {
+    title: 'fs.readFile (async)',
+    steps: [
+      { title: '1. fs.readFile()', desc: 'Llamamos a la función con callback.' },
+      { title: '2. Node APIs', desc: 'Node inicia la lectura del archivo.' },
+      { title: '3. I/O no bloqueante', desc: 'Mientras lee, el servidor puede hacer otras cosas.' },
+      { title: '4. Callback', desc: 'Cuando termina, el callback recibe contenido o error.' },
+    ]
+  },
+  'nodejs-13': {
+    title: 'Streams',
+    steps: [
+      { title: '1. Readable Stream', desc: 'Creamos un stream de lectura del archivo.' },
+      { title: '2. chunks', desc: 'Los datos llegan en pedaços (buffers) pequeños.' },
+      { title: '3. Event: data', desc: 'Por cada chunk, se emite el evento data.' },
+      { title: '4. Event: end', desc: 'Cuando termina, se emite end.' },
+    ]
+  },
+  'nodejs-14': {
+    title: 'Event Emitter',
+    steps: [
+      { title: '1. new EventEmitter()', desc: 'Creamos una instancia del emisor.' },
+      { title: '2. .on("evento")', desc: 'Registramos un handler para un evento.' },
+      { title: '3. .emit("evento")', desc: 'Emitimos el evento, todos los handlers se ejecutan.' },
+      { title: '4. .once()', desc: 'Handler que se ejecuta solo una vez.' },
+    ]
+  },
+  'nodejs-15': {
+    title: 'Error Handling',
+    steps: [
+      { title: '1. Error en callback', desc: 'Error-first callback: (err, data) => {...}' },
+      { title: '2. Verificar error', desc: 'Si err existe, algo salió mal.' },
+      { title: '3. try/catch', desc: 'Para async/await, envolvemos en try/catch.' },
+      { title: '4. Manejo centralizado', desc: 'process.on("uncaughtException") para errores no capturados.' },
+    ]
+  },
+  'nodejs-1': {
+    title: '¿Qué es Node.js?',
+    steps: [
+      { title: '1. Motor V8', desc: 'El mismo motor de Chrome ejecuta tu JavaScript.' },
+      { title: '2. No navegador', desc: 'No tienes DOM, window, ni las APIs del navegador.' },
+      { title: '3. Módulos nativos', desc: 'Accedes al filesystem, network, OS via módulos.' },
+      { title: '4. Event-driven I/O', desc: 'Ideal para operaciones I/O asíncronas.' },
+    ]
+  },
+  'nodejs-2': {
+    title: 'Servidor HTTP',
+    steps: [
+      { title: '1. http.createServer()', desc: 'Crea un servidor HTTP.' },
+      { title: '2. Callback (req, res)', desc: 'Se llama cuando llega un request.' },
+      { title: '3. res.writeHead()', desc: 'Configuramos el código de estado y headers.' },
+      { title: '4. res.end()', desc: 'Enviamos la respuesta y terminamos.' },
+    ]
+  },
+  'nodejs-8': {
+    title: 'npm y package.json',
+    steps: [
+      { title: '1. npm init', desc: 'Crea el archivo package.json interactivo.' },
+      { title: '2. Dependencias', desc: 'Lista de paquetes que tu proyecto necesita.' },
+      { title: '3. npm install', desc: 'Instala todas las dependencias de package.json.' },
+      { title: '4. node_modules/', desc: 'Carpeta donde se descargan los paquetes.' },
+    ]
+  },
+  'nodejs-10': {
+    title: 'fs.writeFile',
+    steps: [
+      { title: '1. fs.writeFile()', desc: 'Llamamos para escribir en un archivo.' },
+      { title: '2. Nombre + contenido', desc: 'Pasamos el path y los datos a escribir.' },
+      { title: '3. Operación async', desc: 'Node inicia la escritura sin bloquear.' },
+      { title: '4. Promesa resuelta', desc: 'Cuando termina, la promesa se resuelve.' },
+    ]
+  },
+  'nodejs-11': {
+    title: 'Módulo path',
+    steps: [
+      { title: '1. path.join()', desc: 'Une segmentos de ruta correctamente.' },
+      { title: '2. path.resolve()', desc: 'Convierte a ruta absoluta.' },
+      { title: '3. path.basename()', desc: 'Extrae el nombre del archivo.' },
+      { title: '4. path.extname()', desc: 'Obtiene la extensión del archivo.' },
+    ]
+  },
+  'nodejs-12': {
+    title: 'Console y Process',
+    steps: [
+      { title: '1. console.log()', desc: 'Imprime a stdout (igual que en navegador).' },
+      { title: '2. process.version', desc: 'Versión de Node.js instalada.' },
+      { title: '3. process.env', desc: 'Variables de entorno del sistema.' },
+      { title: '4. process.argv', desc: 'Argumentos pasados desde la terminal.' },
+    ]
+  },
+  'nodejs-16': {
+    title: 'Buffers',
+    steps: [
+      { title: '1. Buffer.from()', desc: 'Crea un buffer desde una cadena o array.' },
+      { title: '2. Datos binarios', desc: 'Representación cruda de bytes en memoria.' },
+      { title: '3. .toString()', desc: 'Convierte el buffer de vuelta a texto.' },
+      { title: '4. .length', desc: 'Cantidad de bytes en el buffer.' },
+    ]
+  },
+  'nodejs-17': {
+    title: 'Exports múltiples',
+    steps: [
+      { title: '1. module.exports', desc: 'Objeto que se exporta del módulo.' },
+      { title: '2. exports.nombre', desc: 'Shortcut para agregar propiedades.' },
+      { title: '3. destructuring', desc: 'En require podemos usar: const { a, b } = require()' },
+      { title: '4. Re-exportar', desc: 'module.exports = require("./otro") para re-exportar.' },
+    ]
+  },
+  'nodejs-18': {
+    title: 'Buenas prácticas',
+    steps: [
+      { title: '1. Estructura', desc: 'Organiza en /src con rutas, controllers, models.' },
+      { title: '2. async/await', desc: 'Prefiere sobre .then() para código legible.' },
+      { title: '3. Variables de entorno', desc: 'Usa process.env para configuración.' },
+      { title: '4. Manejo de errores', desc: 'Siempre envuelve código async en try/catch.' },
+    ]
+  },
+};
+
+const expressFlows: Record<string, { title: string; steps: { title: string; desc: string }[] }> = {
+  'express-1': {
+    title: 'Servidor Express',
+    steps: [
+      { title: '1. express()', desc: 'Crea la aplicación Express (app).' },
+      { title: '2. app.listen()', desc: 'El servidor comienza a escuchar en un puerto.' },
+      { title: '3. Request llega', desc: 'Cuando un cliente hace una petición.' },
+      { title: '4. Response', desc: 'La app devuelve una respuesta al cliente.' },
+    ]
+  },
+  'express-3': {
+    title: 'Routing',
+    steps: [
+      { title: '1. app.get()', desc: 'Definimos una ruta GET.' },
+      { title: '2. app.post()', desc: 'Definimos una ruta POST.' },
+      { title: '3. Route matching', desc: 'Express busca qué ruta coincide con el request.' },
+      { title: '4. Handler', desc: 'Se ejecuta el handler de la ruta que matcheó.' },
+    ]
+  },
+  'express-4': {
+    title: 'Route Parameters',
+    steps: [
+      { title: '1. /usuarios/:id', desc: 'Definimos parámetro con :nombre.' },
+      { title: '2. Request llega', desc: 'El cliente pide /usuarios/123.' },
+      { title: '3. Express extrae', desc: 'El valor 123 se guarda en req.params.id.' },
+      { title: '4. Handler usa params', desc: 'Podemos acceder a req.params.id en el handler.' },
+    ]
+  },
+  'express-5': {
+    title: 'Query Parameters',
+    steps: [
+      { title: '1. URL con query', desc: '/buscar?q=js&orden=asc' },
+      { title: '2. Express parsea', desc: 'Automáticamente parsea los query parameters.' },
+      { title: '3. req.query', desc: 'Disponible en el objeto req.query.' },
+      { title: '4. Usar valores', desc: 'Podemos acceder a req.query.q, req.query.orden.' },
+    ]
+  },
+  'express-7': {
+    title: 'Middleware Pipeline',
+    steps: [
+      { title: '1. Request entra', desc: 'Llega un HTTP request al servidor.' },
+      { title: '2. Middleware A', desc: 'Se ejecuta el primer middleware (ej: CORS). Llama next().' },
+      { title: '3. Middleware B', desc: 'Se ejecuta el segundo (ej: body parser). Llama next().' },
+      { title: '4. Ruta final', desc: 'Se ejecuta el handler de la ruta. Devuelve response.' },
+    ]
+  },
+  'express-8': {
+    title: 'Built-in Middleware',
+    steps: [
+      { title: '1. express.json()', desc: 'Parsea application/json del body.' },
+      { title: '2. express.urlencoded()', desc: 'Parsea application/x-www-form-urlencoded.' },
+      { title: '3. express.static()', desc: 'Sirve archivos estáticos (CSS, JS, imágenes).' },
+      { title: '4. Orden importa', desc: 'El orden de los app.use() afecta el flujo.' },
+    ]
+  },
+  'express-9': {
+    title: 'Third-party Middleware',
+    steps: [
+      { title: '1. npm install', desc: 'Instalamos el paquete (cors, morgan, etc).' },
+      { title: '2. require()', desc: 'Lo importamos en el código.' },
+      { title: '3. app.use()', desc: 'Lo registramos como middleware.' },
+      { title: '4. Automático', desc: 'Se ejecuta en cada request automáticamente.' },
+    ]
+  },
+  'express-10': {
+    title: 'Custom Middleware',
+    steps: [
+      { title: '1. Función', desc: 'Creamos function(req, res, next) {...}' },
+      { title: '2. Lógica', desc: 'Validamos, transformamos, logueamos, etc.' },
+      { title: '3. next()', desc: 'Si todo está bien, llamamos next().' },
+      { title: '4. Encadenar', desc: 'Podemos encadenar múltiples middleware.' },
+    ]
+  },
+  'express-11': {
+    title: 'Error Handling',
+    steps: [
+      { title: '1. 404', desc: 'Si ninguna ruta matchea, se ejecuta el 404.' },
+      { title: '2. Error thrown', desc: 'Una ruta lanza un error con next(err).' },
+      { title: '3. Error middleware', desc: 'app.use((err, req, res, next) => {...})' },
+      { title: '4. Manejo centralizado', desc: 'Un solo lugar para manejar todos los errores.' },
+    ]
+  },
+  'express-12': {
+    title: 'Body Parsing',
+    steps: [
+      { title: '1. Request con body', desc: 'POST/PUT envía datos en el body.' },
+      { title: '2. Middleware parsea', desc: 'express.json() parsea el JSON.' },
+      { title: '3. req.body', desc: 'Los datos quedan disponibles en req.body.' },
+      { title: '4. En el handler', desc: 'Accedemos a req.body.nombre, req.body.email, etc.' },
+    ]
+  },
+  'express-13': {
+    title: 'CORS',
+    steps: [
+      { title: '1. Same-origin', desc: 'Por defecto, el navegador bloquea requests cross-origin.' },
+      { title: '2. CORS middleware', desc: 'app.use(cors()) habilita todos los orígenes.' },
+      { title: '3. Preflight', desc: 'OPTIONS se envía antes para verificar permisos.' },
+      { title: '4. Access-Control', desc: 'Se envían headers para permitir el request.' },
+    ]
+  },
+  'express-14': {
+    title: 'Environment Variables',
+    steps: [
+      { title: '1. .env file', desc: 'Archivo con variables: PORT=3000, DB_URL=...' },
+      { title: '2. require("dotenv")', desc: 'Importamos dotenv al inicio.' },
+      { title: '3. .config()', desc: 'Carga las variables a process.env.' },
+      { title: '4. process.env', desc: 'Accedemos donde necesitamos: process.env.PORT' },
+    ]
+  },
+  'express-16': {
+    title: 'express.Router()',
+    steps: [
+      { title: '1. Router separado', desc: 'Creamos router = express.Router().' },
+      { title: '2. Rutas del router', desc: 'router.get(), router.post() para este módulo.' },
+      { title: '3. app.use()', desc: 'Conectamos: app.use("/api/usuarios", router).' },
+      { title: '4. Prefijo automático', desc: 'Todas las rutas del router tienen /api/usuarios.' },
+    ]
+  },
+  'express-17': {
+    title: '3-Tier Architecture',
+    steps: [
+      { title: '1. Routes', desc: 'Definen endpoints y reciben requests.' },
+      { title: '2. Controller', desc: 'Contiene la lógica de negocio. Llama al service.' },
+      { title: '3. Service', desc: 'Lógica de negocio. Transforma datos.' },
+      { title: '4. Model/Data Access', desc: 'Se comunica con la base de datos.' },
+    ]
+  },
+};
+
+function buildNodejsFlowPreview(jsCode: string, lessonId: string): string {
+  const flow = nodejsFlows[lessonId] || {
+    title: 'Node.js Flow',
+    steps: [
+      { title: '1. Código', desc: 'Tu código JavaScript se ejecuta.' },
+      { title: '2. Node APIs', desc: 'Operaciones asíncronas del runtime.' },
+      { title: '3. Callbacks', desc: 'Las operaciones completan y disparan callbacks.' },
+      { title: '4. Resultado', desc: 'El resultado está disponible.' },
+    ]
+  };
+
+  const steps = flow.steps.map((step, i) => `
+      <div class="step" id="step${i + 1}" style="animation-delay: ${0.2 + i * 0.4}s; border-color: ${['#0f0', '#ff0', '#0ff', '#f0f'][i]}">
+        <div class="step-title">${step.title}</div>
+        <div class="step-desc">${step.desc}</div>
+      </div>
+    `).join('');
+
+  return `<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #1a1a2e;
+      color: #eee;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    .container { display: flex; gap: 20px; height: 100vh; }
+    .code-panel {
+      flex: 1;
+      background: #16213e;
+      border-radius: 12px;
+      padding: 20px;
+      overflow: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .code-panel pre { margin: 0; color: #0f0; }
+    .flow-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      overflow: auto;
+    }
+    .flow-title {
+      color: #0f0;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+    .step {
+      background: #16213e;
+      border-radius: 10px;
+      padding: 15px 20px;
+      border-left: 4px solid #0f0;
+      animation: slideIn 0.5s ease-out forwards;
+      opacity: 0;
+    }
+    .step-title { font-weight: 600; margin-bottom: 5px; }
+    .step-desc { font-size: 12px; opacity: 0.8; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="code-panel">
+      <h3>Node.js: ${flow.title}</h3>
+      <pre>${escapeHtml(jsCode)}</pre>
+    </div>
+    <div class="flow-panel">
+      <div class="flow-title">${flow.title}</div>
+      ${steps}
+    </div>
+  </div>
+</body>
+</html>`;
+}
+
+function buildExpressFlowPreview(jsCode: string, lessonId: string): string {
+  const flow = expressFlows[lessonId] || {
+    title: 'Express Flow',
+    steps: [
+      { title: '1. Request', desc: 'HTTP request llega al servidor.' },
+      { title: '2. Middleware', desc: 'Los middleware procesan la solicitud.' },
+      { title: '3. Router', desc: 'Se busca la ruta que coincide.' },
+      { title: '4. Response', desc: 'Se devuelve la respuesta.' },
+    ]
+  };
+
+  const stages = flow.steps.map((step, i) => `
+      <div class="stage" style="animation-delay: ${0.3 + i * 0.5}s; border-color: ${['#f0f', '#0ff', '#ff0', '#0f0'][i]}">
+        <div class="stage-title">${step.title}</div>
+        <div class="stage-desc">${step.desc}</div>
+      </div>
+    `).join('');
+
+  return `<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #1a1a2e;
+      color: #eee;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      padding: 20px;
+      min-height: 100vh;
+    }
+    .container { display: flex; gap: 20px; height: 100vh; }
+    .code-panel {
+      flex: 1;
+      background: #16213e;
+      border-radius: 12px;
+      padding: 20px;
+      overflow: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .code-panel pre { margin: 0; color: #0f0; }
+    .flow-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow: auto;
+    }
+    .flow-title {
+      color: #0f0;
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+    .pipeline {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      background: #16213e;
+      border-radius: 12px;
+      padding: 20px;
+      position: relative;
+    }
+    .pipeline::before {
+      content: '';
+      position: absolute;
+      left: 30px;
+      top: 50px;
+      bottom: 50px;
+      width: 3px;
+      background: linear-gradient(to bottom, #f0f, #0ff, #ff0, #0f0);
+      animation: flowDown 2s ease-in-out infinite;
+    }
+    @keyframes flowDown {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 1; }
+    }
+    .stage {
+      background: #0f3460;
+      border-radius: 10px;
+      padding: 12px 20px;
+      border: 2px solid #0f0;
+      position: relative;
+      z-index: 1;
+      animation: stageIn 0.5s ease-out forwards;
+      opacity: 0;
+    }
+    .stage-title { font-weight: 600; margin-bottom: 3px; }
+    .stage-desc { font-size: 11px; opacity: 0.8; }
+    @keyframes stageIn {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="code-panel">
+      <h3>Express.js: ${flow.title}</h3>
+      <pre>${escapeHtml(jsCode)}</pre>
+    </div>
+    <div class="flow-panel">
+      <div class="flow-title">${flow.title}</div>
+      <div class="pipeline">
+        ${stages}
+      </div>
+    </div>
+  </div>
+</body>
+</html>`;
 }
 
 export default function Modal() {
@@ -142,6 +646,12 @@ export default function Modal() {
 </html>`;
     }
 
+    // Node.js and Express: Code + Animated Flow Diagram
+    if (primaryLanguage === 'nodejs' || primaryLanguage === 'express') {
+      const jsCode = code.javascript || selectedLesson.code.javascript || '';
+      return buildFlowPreview(primaryLanguage, jsCode, selectedLesson.id);
+    }
+
     const { html, css, javascript } = code;
     const shouldIncludeCSS = primaryLanguage !== 'html';
     const shouldIncludeJS = primaryLanguage === 'javascript';
@@ -189,6 +699,8 @@ export default function Modal() {
     css: ['html', 'css'],
     javascript: ['html', 'css', 'javascript'],
     git: ['git'],
+    nodejs: ['javascript'],
+    express: ['javascript'],
   };
 
   const getGitDemoCommand = (lessonId: string | undefined): string => {

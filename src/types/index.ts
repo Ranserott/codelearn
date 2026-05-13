@@ -1,4 +1,4 @@
-export type Language = 'html' | 'css' | 'javascript' | 'git';
+export type Language = 'html' | 'css' | 'javascript' | 'git' | 'nodejs' | 'express';
 
 export interface LessonCode {
   html: string;

@@ -8,6 +8,8 @@ const sections: { id: Language; label: string; description: string }[] = [
   { id: 'css', label: 'CSS', description: 'Estilos' },
   { id: 'javascript', label: 'JS', description: 'Interacción' },
   { id: 'git', label: 'Git', description: 'Versiones' },
+  { id: 'nodejs', label: 'Node.js', description: 'Servidor' },
+  { id: 'express', label: 'Express', description: 'Framework' },
 ];
 
 export default function Sidebar() {

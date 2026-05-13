@@ -1,6 +1,7 @@
 import { Lesson } from '@/types';
 
-export const lessons: Lesson[] = [
+// Frontend lessons (HTML/CSS/JS/Git)
+const frontendLessons: Lesson[] = [
   // HTML - 17 lecciones incrementales
   {
     id: 'html-1',
@@ -3053,11 +3054,1373 @@ git stash clear`
   }
 ];
 
+// Node.js - 18 lecciones
+const nodejsLessons: Lesson[] = [
+  // Fundamentos
+  {
+    id: 'nodejs-1',
+    title: '1. ¿Qué es Node.js?',
+    description: 'Node.js es un entorno de ejecución de JavaScript construido sobre el motor V8 de Chrome. Es event-driven y non-blocking I/O, ideal para aplicaciones en tiempo real.',
+    language: 'nodejs',
+    category: 'fundamentos',
+    code: {
+      html: '',
+      css: '',
+      javascript: `// Node.js usa el motor V8 igual que el navegador
+// Pero NO tiene las mismas APIs del navegador
+
+console.log('JavaScript en Node.js');
+console.log(process.version);
+console.log('Plataforma:', process.platform);`,
+      git: ''
+    }
+  },
+  {
+    id: 'nodejs-2',
+    title: '2. Mi primer servidor HTTP',
+    description: 'Crea un servidor web básico con el módulo http nativo de Node.js. Cada request triggering un callback con request y response.',
+    language: 'nodejs',
+    category: 'fundamentos',
+    code: {
+      html: '',
+      css: '',
+      javascript: `const http = require('http');
+
+const server = http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.end('¡Hola desde Node.js!');
+});
+
+server.listen(3000, () => {
+  console.log('Servidor corriendo en http://localhost:3000');
+});`,
+      git: ''
+    }
+  },
+  // Modelo de Asincronía
+  {
+    id: 'nodejs-3',
+    title: '3. El Event Loop',
+    description: 'El Event Loop es el corazón de Node.js. Permite manejar miles de conexiones concurrentes sin bloquear. JS es single-thread pero las operaciones I/O son asíncronas.',
+    language: 'nodejs',
+    category: 'flujos',
+    code: {
+      html: '',
+      css: '',
+      javascript: `// Node.js procesa operaciones en este orden:
+// 1. Call Stack (synchronous code)
+// 2. Node APIs (setTimeout, fs, etc.)
+// 3. Callback Queue (cuando las APIs terminan)
+
+console.log('1. Synchronous'); // se ejecuta primero
+
+setTimeout(() => {
+  console.log('3. setTimeout callback'); // se ejecuta después
+}, 0);
+
+console.log('2. Synchronous'); // se ejecuta segundo
+
+// Output:
+// 1. Synchronous
+// 2. Synchronous
+// 3. setTimeout callback`,
+      git: ''
+    }
+  },
+  {
+    id: 'nodejs-4',
+    title: '4. Callbacks',
+    description: 'Un callback es una función que se pasa como argumento y se ejecuta después de que una operación asíncrona termina. Es el patrón fundamental de Node.js.',
+    language: 'nodejs',
+    category: 'async',
+    code: {
+      html: '',
+      css: '',
+      javascript: `// Callback: función que se pasa como argumento
+function procesar(datos, callback) {
+  setTimeout(() => {
+    const resultado = datos.toUpperCase();
+    callback(null, resultado);
+  }, 1000);
+}
+
+procesar('hola mundo', (err, resultado) => {
+  if (err) {
+    console.error('Error:', err);
+  } else {
+    console.log('Resultado:', resultado); // HOLA MUNDO
+  }
+});
+
+console.log('Esperando callback...');`,
+      git: ''
+    }
+  },
+  {
+    id: 'nodejs-5',
+    title: '5. Promesas (Promises)',
+    description: 'Las Promesas son una mejora sobre los callbacks. Permiten encadenar operaciones con .then() y manejar errores con .catch().',
+    language: 'nodejs',
+    category: 'async',
+    code: {
+      html: '',
+      css: '',
+      javascript: `// Promesa: representa un valor futuro
+const promesa = new Promise((resolve, reject) => {
+  setTimeout(() => {
+    const exito = true;
+    if (exito) {
+      resolve('¡Datos cargados!');
+    } else {
+      reject('Error al cargar');
+    }
+  }, 1000);
+});
+
+// Encadenar .then() y .catch()
+promesa
+  .then((datos) => {
+    console.log('Éxito:', datos);
+    return datos.toUpperCase();
+  })
+  .then((mayusculas) => {
+    console.log('Transformado:', mayusculas);
+  })
+  .catch((error) => {
+    console.error('Falló:', error);
+  });
+
+console.log('Promesa creada, esperando...');`,
+      git: ''
+    }
+  },
+  {
+    id: 'nodejs-6',
+    title: '6. Async/Await',
+    description: 'Async/await es la sintaxis moderna para trabajar con Promesas. Hace el código asíncrono parecer síncrono y es más fácil de leer.',
+    language: 'nodejs',
+    category: 'async',
+    code: {
+      html: '',
+      css: '',
+      javascript: `// Función asíncrona: devuelve una Promesa
+async function obtenerDatos() {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({ id: 1, nombre: 'Carlos' });
+    }, 1000);
+  });
+}
+
+// await solo funciona dentro de funciones async
+async function main() {
+  console.log('Cargando...');
+
+  const datos = await obtenerDatos();
+  console.log('Datos recibidos:', datos);
+
+  const nombre = datos.nombre.toUpperCase();
+  console.log('Nombre:', nombre);
+}
+
+main().then(() => {
+  console.log('¡Completado!');
+});`,
+      git: ''
+    }
+  },
+  // Módulos
+  {
+    id: 'nodejs-7',
+    title: '7. CommonJS: require y module.exports',
+    description: 'Node.js usa CommonJS para modularizar código. require() importa y module.exports exporta. Cada archivo es un módulo independiente.',
+    language: 'nodejs',
+    category: 'modulos',
+    code: {
+      html: '',
+      css: '',
+      javascript: `// --- math.js ---
+// module.exports exporta lo que el módulo expone
+const sumar = (a, b) => a + b;
+const restar = (a, b) => a - b;
+
+module.exports = { sumar, restar };
+
+// --- main.js ---
+// require() importa el módulo
+const math = require('./math');
+
+console.log('Suma:', math.sumar(5, 3));      // 8
+console.log('Resta:', math.restar(10, 4)); // 6
+
+// También puedes desestructurar:
+const { sumar } = require('./math');`,
+      git: ''
+    }
+  },
+  {
+    id: 'nodejs-8',
+    title: '8. npm y package.json',
+    description: 'npm es el gestor de paquetes de Node.js. package.json define las dependencias y scripts de tu proyecto.',
+    language: 'nodejs',
+    category: 'modulos',
+    code: {
+      html: '',
+      css: '',
+      javascript: `// package.json define el proyecto
+// {
+//   "name": "mi-proyecto",
+//   "version": "1.0.0",
+//   "scripts": {
+//     "start": "node index.js",
+//     "dev": "nodemon index.js"
+//   },
+//   "dependencies": {
+//     "express": "^4.18.0"
+//   }
+// }
+
+// Comandos comunes:
+// npm init -y        → crear package.json
+// npm install        → instalar dependencias
+// npm install express → instalar un paquete
+// npm run start      → ejecutar script "start"
+
+// node_modules/ contiene los paquetes instalados`,
+      git: ''
+    }
+  },
+  {
+    id: 'nodejs-9',
+    title: '9. Módulo fs: leer archivos',
+    description: 'El módulo fs (file system) permite leer y escribir archivos. Tiene versiones síncronas y asíncronas (con callbacks o Promises).',
+    language: 'nodejs',
+    category: 'archivos',
+    code: {
+      html: '',
+      css: '',
+      javascript: `const fs = require('fs').promises;
+
+async function leerArchivo() {
+  try {
+    // Leer archivo de forma asíncrona
+    const contenido = await fs.readFile('datos.txt', 'utf8');
+    console.log('Contenido:', contenido);
+
+    // Ver información del archivo
+    const stats = await fs.stat('datos.txt');
+    console.log('Tamaño:', stats.size, 'bytes');
+    console.log('Creado:', stats.birthtime);
+  } catch (error) {
+    console.error('Error:', error.message);
+  }
+}
+
+leerArchivo();
+
+// Versión síncrona (bloquea):
+// const contenido = fs.readFileSync('datos.txt', 'utf8');`,
+      git: ''
+    }
+  },
+  {
+    id: 'nodejs-10',
+    title: '10. Módulo fs: escribir archivos',
+    description: 'El módulo fs también permite escribir archivos. Puedes crear, sobreescribir o añadir contenido.',
+    language: 'nodejs',
+    category: 'archivos',
+    code: {
+      html: '',
+      css: '',
+      javascript: `const fs = require('fs').promises;
+
+async function escribirArchivo() {
+  const datos = {
+    nombre: 'Ana',
+    edad: 28,
+    ciudad: 'Madrid'
+  };
+
+  // Escribir como texto
+  await fs.writeFile('usuario.txt', JSON.stringify(datos));
+  console.log('Archivo escrito');
+
+  // Leer y parsear JSON
+  const contenido = await fs.readFile('usuario.txt', 'utf8');
+  const usuario = JSON.parse(contenido);
+  console.log('Usuario:', usuario.nombre);
+
+  // Añadir al archivo
+  await fs.appendFile('log.txt', 'Nuevo registro\\n');
+  console.log('Añadido al log');
+}
+
+escribirArchivo().catch(console.error);`,
+      git: ''
+    }
+  },
+  {
+    id: 'nodejs-11',
+    title: '11. Módulo path',
+    description: 'El módulo path ayuda a trabajar con rutas de archivos de forma portable. Resuelve problemas de compatibilidad entre sistemas operativos.',
+    language: 'nodejs',
+    category: 'archivos',
+    code: {
+      html: '',
+      css: '',
+      javascript: `const path = require('path');
+
+// Unir segmentos de ruta
+const ruta = path.join('carpeta', 'subcarpeta', 'archivo.txt');
+console.log('Ruta completa:', ruta);
+// Linux/Mac: carpeta/subcarpeta/archivo.txt
+// Windows: carpeta\\subcarpeta\\archivo.txt
+
+// Obtener información
+console.log('Directorio:', path.dirname(ruta));
+console.log('Nombre:', path.basename(ruta));
+console.log('Extensión:', path.extname(ruta));
+
+// Resolver a ruta absoluta
+const abs = path.resolve('archivo.txt');
+console.log('Absoluta:', abs);
+
+// Unir con la raíz del proyecto
+const proyecto = path.resolve(__dirname, '..');
+console.log('Raíz proyecto:', proyecto);`,
+      git: ''
+    }
+  },
+  // Conceptos Avanzados
+  {
+    id: 'nodejs-12',
+    title: '12. Console y process',
+    description: 'Console es similar al navegador. process proporciona información sobre el proceso actual: versión de Node, plataforma, variables de entorno.',
+    language: 'nodejs',
+    category: 'fundamentos',
+    code: {
+      html: '',
+      css: '',
+      javascript: `// process: información del proceso actual
+console.log('Versión Node:', process.version);
+console.log('Plataforma:', process.platform);
+console.log('Arquitectura:', process.arch);
+console.log('Memoria:', process.memoryUsage());
+console.log('Uptime:', process.uptime(), 'segundos');
+
+// Argumentos de línea de comando
+// node app.js arg1 arg2
+console.log('Argumentos:', process.argv);
+
+// Variables de entorno
+// NOMBRE=Juan node app.js
+console.log('NOMBRE:', process.env.NOMBRE || 'no definido');
+
+// Exit codes
+// process.exit(0); // éxito
+// process.exit(1); // error`,
+      git: ''
+    }
+  },
+  {
+    id: 'nodejs-13',
+    title: '13. Streams',
+    description: 'Los Streams permiten procesar datos pieza por pieza en lugar de cargar todo en memoria. Ideal para archivos grandes o datos continuos.',
+    language: 'nodejs',
+    category: 'archivos',
+    code: {
+      html: '',
+      css: '',
+      javascript: `const fs = require('fs');
+const readable = fs.createReadStream('archivo-grande.txt', {
+  encoding: 'utf8',
+  highWaterMark: 64 * 1024 // 64KB por chunk
+});
+
+let contador = 0;
+
+readable.on('data', (chunk) => {
+  console.log('Chunk recibido:', chunk.length, 'bytes');
+  contador++;
+});
+
+readable.on('end', () => {
+  console.log('Total chunks:', contador);
+});
+
+readable.on('error', (err) => {
+  console.error('Error:', err.message);
+});
+
+// Pipes: encadenar streams
+// readable.pipe(transform).pipe(writable);`,
+      git: ''
+    }
+  },
+  {
+    id: 'nodejs-14',
+    title: '14. Event Emitter',
+    description: 'EventEmitter es el patrón pub/sub de Node.js. Permite emitir y escuchar eventos, desacoplando partes del código.',
+    language: 'nodejs',
+    category: 'eventos',
+    code: {
+      html: '',
+      css: '',
+      javascript: `const EventEmitter = require('events');
+
+// Crear un emisor
+const emisor = new EventEmitter();
+
+// Escuchar eventos
+emisor.on('saludo', (nombre) => {
+  console.log('¡Hola,', nombre, '!');
+});
+
+emisor.on('despedida', function(nombre) {
+  console.log('Chao,', nombre);
+});
+
+// Emitir eventos
+emisor.emit('saludo', 'Ana');
+emisor.emit('despedida', 'Carlos');
+
+// Una sola vez
+emisor.once('una-sola-vez', () => {
+  console.log('Esto se ejecuta solo una vez');
+});
+
+emisor.emit('una-sola-vez');
+emisor.emit('una-sola-vez'); // no hace nada`,
+      git: ''
+    }
+  },
+  {
+    id: 'nodejs-15',
+    title: '15. Manejo de errores',
+    description: 'Node.js usa errores de forma diferente. Los callbacks usan "error-first" (err como primer argumento). Las Promesas usan .catch().',
+    language: 'nodejs',
+    category: 'flujos',
+    code: {
+      html: '',
+      css: '',
+      javascript: `// Error-first callbacks (estilo Node.js)
+function leerConError(callback) {
+  setTimeout(() => {
+    const error = null; // o un objeto Error
+    const datos = 'contenido';
+
+    if (error) {
+      callback(error, null);
+    } else {
+      callback(null, datos);
+    }
+  }, 1000);
+}
+
+// try/catch para Promesas/async-await
+async function main() {
+  try {
+    const datos = await new Promise((resolve, reject) => {
+      setTimeout(() => {
+        reject(new Error('Falló algo'));
+      }, 1000);
+    });
+    console.log(datos);
+  } catch (error) {
+    console.error('Capturado:', error.message);
+  }
+}
+
+main();`,
+      git: ''
+    }
+  },
+  {
+    id: 'nodejs-16',
+    title: '16. Buffers',
+    description: 'Los Buffers representan datos binarios crudos. Son útiles para manejar datos que no son texto (imágenes, archivos, protocolos de red).',
+    language: 'nodejs',
+    category: 'archivos',
+    code: {
+      html: '',
+      css: '',
+      javascript: `// Buffer: datos binarios
+const buf = Buffer.from('Hola');
+console.log('Buffer:', buf);
+console.log('Como texto:', buf.toString());
+console.log('Longitud:', buf.length);
+
+// Crear buffer de bytes específicos
+const buf2 = Buffer.from([72, 111, 108, 97]);
+console.log('Como texto:', buf2.toString());
+
+// Buffer para datos binarios (ej: colores RGB)
+const color = Buffer.from([255, 128, 0]);
+console.log('Rojo:', color[0]);
+console.log('Verde:', color[1]);
+console.log('Azul:', color[2]);
+
+// Convertir a Base64
+const base64 = buf.toString('base64');
+console.log('Base64:', base64);`,
+      git: ''
+    }
+  },
+  {
+    id: 'nodejs-17',
+    title: '17. Exports múltiples',
+    description: 'Aprende diferentes formas de exportar desde un módulo: exports individual, exports agrupado, y re-exportar.',
+    language: 'nodejs',
+    category: 'modulos',
+    code: {
+      html: '',
+      css: '',
+      javascript: `// --- formas de exportar ---
+
+// 1. module.exports único (más común)
+module.exports = class Calculadora {
+  sumar(a, b) { return a + b; }
+};
+
+// 2. exports.nombre para múltiples
+exports.sumar = (a, b) => a + b;
+exports.restar = (a, b) => a - b;
+// Equivale a: module.exports.sumar = ...
+
+// 3. Re-exportar
+// module.exports = require('./otro');
+
+// --- formas de importar ---
+const Calc = require('./calculadora');
+const { sumar, restar } = require('./operaciones');`,
+      git: ''
+    }
+  },
+  {
+    id: 'nodejs-18',
+    title: '18. Buenas prácticas',
+    description: 'Convenciones y patrones para escribir código Node.js limpio: manejo de errores, estructura de proyecto, y configuración.',
+    language: 'nodejs',
+    category: 'buenas-practicas',
+    code: {
+      html: '',
+      css: '',
+      javascript: `// 1. Manejo de errores siempre
+process.on('uncaughtException', (err) => {
+  console.error('Error no capturado:', err);
+  process.exit(1);
+});
+
+// 2. Usa async/await sobre then/catch
+async function obtenerDatos() {
+  try {
+    const res = await fetch(url);
+    return await res.json();
+  } catch (error) {
+    console.error('Error:', error.message);
+    throw error;
+  }
+}
+
+// 3. Variables de entorno para config
+const PORT = process.env.PORT || 3000;
+const DB_URL = process.env.DATABASE_URL;
+
+// 4. Estructura de proyecto
+// /proyecto
+//   /src
+//     /routes
+//     /controllers
+//     /models
+//   index.js
+//   package.json
+
+// 5. Scripts en package.json
+// "dev": "nodemon src/index.js",
+// "start": "node src/index.js",
+// "test": "jest"`,
+      git: ''
+    }
+  },
+];
+
+// Express.js - 18 lecciones
+const expressLessons: Lesson[] = [
+  // Fundamentos
+  {
+    id: 'express-1',
+    title: '1. ¿Qué es Express.js?',
+    description: 'Express.js es un framework web minimalista y flexible para Node.js. Proporciona herramientas para crear APIs y servidores web de forma rápida.',
+    language: 'express',
+    category: 'fundamentos',
+    code: {
+      html: '',
+      css: '',
+      javascript: `// npm install express
+const express = require('express');
+const app = express();
+
+// Rutas básicas
+app.get('/', (req, res) => {
+  res.send('¡Hola desde Express!');
+});
+
+app.get('/about', (req, res) => {
+  res.json({ version: '1.0', status: 'ok' });
+});
+
+// Iniciar servidor
+app.listen(3000, () => {
+  console.log('Servidor en http://localhost:3000');
+});`,
+      git: ''
+    }
+  },
+  {
+    id: 'express-2',
+    title: '2. Estructura de un proyecto Express',
+    description: 'Un proyecto Express típico tiene: app.js (o index.js) para la configuración, routes/ para las rutas, y server.js para iniciar el servidor.',
+    language: 'express',
+    category: 'fundamentos',
+    code: {
+      html: '',
+      css: '',
+      javascript: `// --- package.json ---
+// { "scripts": { "start": "node server.js" } }
+
+// --- server.js ---
+const app = require('./app');
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(\`Servidor corriendo en puerto \${PORT}\`);
+});
+
+// --- app.js ---
+const express = require('express');
+const routes = require('./routes/usuarios');
+
+const app = express();
+
+// Middleware
+app.use(express.json());
+
+// Rutas
+app.use('/api/usuarios', routes);
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ error: 'No encontrado' });
+});
+
+module.exports = app;`,
+      git: ''
+    }
+  },
+  // Routing
+  {
+    id: 'express-3',
+    title: '3. Routing básico',
+    description: 'Las rutas en Express definen cómo una aplicación responde a solicitudes HTTP. Cada ruta tiene un patrón y un handler.',
+    language: 'express',
+    category: 'routing',
+    code: {
+      html: '',
+      css: '',
+      javascript: `const express = require('express');
+const app = express();
+
+// GET: obtener recursos
+app.get('/usuarios', (req, res) => {
+  res.json([
+    { id: 1, nombre: 'Ana' },
+    { id: 2, nombre: 'Carlos' }
+  ]);
+});
+
+// POST: crear recurso
+app.post('/usuarios', (req, res) => {
+  const nuevo = req.body;
+  nuevo.id = Date.now();
+  res.status(201).json(nuevo);
+});
+
+// PUT: actualizar recurso completo
+app.put('/usuarios/:id', (req, res) => {
+  res.json({ mensaje: 'Usuario actualizado' });
+});
+
+// DELETE: eliminar recurso
+app.delete('/usuarios/:id', (req, res) => {
+  res.status(204).send();
+});
+
+// PATCH: actualización parcial
+app.patch('/usuarios/:id', (req, res) => {
+  res.json({ mensaje: 'Usuario modificado parcialmente' });
+});`,
+      git: ''
+    }
+  },
+  {
+    id: 'express-4',
+    title: '4. Route parameters',
+    description: 'Los parámetros de ruta capturan valores de la URL como /usuarios/123. Se acceden con req.params.',
+    language: 'express',
+    category: 'routing',
+    code: {
+      html: '',
+      css: '',
+      javascript: `const express = require('express');
+const app = express();
+
+// Parámetro requerido (dos puntos)
+app.get('/usuarios/:id', (req, res) => {
+  const id = req.params.id;
+  res.json({ id, mensaje: \`Usuario \${id}\` });
+});
+
+// Múltiples parámetros
+app.get('/usuarios/:userId/libros/:libroId', (req, res) => {
+  const { userId, libroId } = req.params;
+  res.json({ userId, libroId });
+});
+
+// Parámetros con formato (regex)
+app.get('/mensajes/:id([0-9]+)', (req, res) => {
+  res.json({ id: req.params.id });
+});
+
+// Parámetro opcional
+app.get('/archivos(*)', (req, res) => {
+  const ruta = req.params[0];
+  res.json({ ruta: ruta || '/' });
+});`,
+      git: ''
+    }
+  },
+  {
+    id: 'express-5',
+    title: '5. Query parameters',
+    description: 'Los query parameters van después del ? en la URL: /buscar?q=javascript&orden=asc. Se acceden con req.query.',
+    language: 'express',
+    category: 'routing',
+    code: {
+      html: '',
+      css: '',
+      javascript: `const express = require('express');
+const app = express();
+
+app.get('/buscar', (req, res) => {
+  const { q, pagina = 1, orden = 'asc' } = req.query;
+
+  res.json({
+    busqueda: q,
+    pagina: parseInt(pagina),
+    orden,
+    resultados: [
+      { id: 1, titulo: 'JavaScript Guía' },
+      { id: 2, titulo: 'Node.js Avanzado' }
+    ]
+  });
+});
+
+// URL: /buscar?q=js&pagina=2&orden=desc
+// req.query = { q: 'js', pagina: '2', orden: 'desc' }
+
+app.get('/filtrar', (req, res) => {
+  // Verificar si existe un query
+  if (req.query.activo === 'true') {
+    return res.json({ items: ['item1', 'item2'] });
+  }
+  res.json({ items: [] });
+});`,
+      git: ''
+    }
+  },
+  {
+    id: 'express-6',
+    title: '6. HTTP Methods y Códigos de Estado',
+    description: 'Cada método HTTP tiene un propósito. Los códigos de estado indican el resultado: 200=éxito, 404=no existe, 500=error del servidor.',
+    language: 'express',
+    category: 'routing',
+    code: {
+      html: '',
+      css: '',
+      javascript: `const express = require('express');
+const app = express();
+
+// Códigos de estado comunes:
+// 200 OK - solicitud exitosa
+// 201 Created - recurso creado
+// 204 No Content - respuesta vacía
+// 400 Bad Request - solicitud inválida
+// 401 Unauthorized - no autenticado
+// 403 Forbidden - sin permisos
+// 404 Not Found - recurso no existe
+// 500 Internal Server Error
+
+app.get('/recurso', (req, res) => {
+  res.status(200).json({ ok: true });
+});
+
+app.post('/recurso', (req, res) => {
+  // 201: algo fue creado
+  res.status(201).json({ creado: true });
+});
+
+app.delete('/recurso/:id', (req, res) => {
+  const existe = false;
+  if (!existe) {
+    // 404: no se encontró
+    return res.status(404).json({ error: 'No existe' });
+  }
+  // 204: se borró pero no hay contenido que devolver
+  res.status(204).send();
+});`,
+      git: ''
+    }
+  },
+  // Middleware
+  {
+    id: 'express-7',
+    title: '7. ¿Qué es Middleware?',
+    description: 'El middleware es una función que procesa las solicitudes antes de que lleguen a la ruta final. Se ejecutan en orden, de arriba a abajo.',
+    language: 'express',
+    category: 'middleware',
+    code: {
+      html: '',
+      css: '',
+      javascript: `const express = require('express');
+const app = express();
+
+// MIDDLEWARE: función que recibe req, res, y next
+const logger = (req, res, next) => {
+  console.log(\`\${req.method} \${req.url}\`);
+  next(); // ¡Importante! Pasar al siguiente middleware
+};
+
+const autenticar = (req, res, next) => {
+  const token = req.headers.authorization;
+  if (token === 'Bearer secreto') {
+    next(); // Permitir acceso
+  } else {
+    res.status(401).json({ error: 'No autorizado' });
+  }
+};
+
+// Usar middleware global (TODAS las rutas)
+app.use(logger);
+
+// Usar middleware en ruta específica
+app.get('/protegido', autenticar, (req, res) => {
+  res.json({ secreto: 'información privada' });
+});
+
+// Middleware de errores (4 parámetros)
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: 'Algo salió mal' });
+});`,
+      git: ''
+    }
+  },
+  {
+    id: 'express-8',
+    title: '8. Built-in middleware',
+    description: 'Express tiene middleware incorporado: express.json() para parsear JSON, express.urlencoded() para formularios, y express.static() para archivos estáticos.',
+    language: 'express',
+    category: 'middleware',
+    code: {
+      html: '',
+      css: '',
+      javascript: `const express = require('express');
+const path = require('path');
+const app = express();
+
+// Parsear JSON en el body
+app.use(express.json());
+
+// Parsear datos de formularios (URL-encoded)
+app.use(express.urlencoded({ extended: true }));
+
+// Servir archivos estáticos (css, js, imágenes)
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Rutas API (después de los middlewares de parsing)
+app.post('/api/usuario', (req, res) => {
+  // req.body contiene los datos JSON
+  console.log(req.body);
+  res.json({ recibido: req.body });
+});
+
+// URL: /css/estilos.css sirve desde /public/css/estilos.css`,
+      git: ''
+    }
+  },
+  {
+    id: 'express-9',
+    title: '9. Third-party middleware',
+    description: 'Middleware de terceros extiende Express: cors para cross-origin, morgan para logging, helmet para seguridad.',
+    language: 'express',
+    category: 'middleware',
+    code: {
+      html: '',
+      css: '',
+      javascript: `// npm install cors morgan helmet
+const express = require('express');
+const cors = require('cors');
+const morgan = require('morgan');
+const helmet = require('helmet');
+
+const app = express();
+
+// CORS: permite requests desde otros dominios
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true
+}));
+
+// Morgan: logging de requests
+app.use(morgan('dev'));
+// Formato: GET /ruta 200 3.5ms
+
+// Helmet: headers de seguridad
+app.use(helmet());
+
+// Ahora las rutas tienen logging y seguridad automáticos`,
+      git: ''
+    }
+  },
+  {
+    id: 'express-10',
+    title: '10. Custom middleware',
+    description: 'Crea tu propio middleware para validar datos, transformar información, o implementar lógica compartida entre rutas.',
+    language: 'express',
+    category: 'middleware',
+    code: {
+      html: '',
+      css: '',
+      javascript: `const express = require('express');
+const app = express();
+
+// Middleware de validación
+const validarEmail = (req, res, next) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ error: 'Email requerido' });
+  }
+
+  if (!email.includes('@')) {
+    return res.status(400).json({ error: 'Email inválido' });
+  }
+
+  next(); // Pasar al siguiente middleware/ruta
+};
+
+// Middleware de transformación
+const normalizarTexto = (req, res, next) => {
+  if (req.body.nombre) {
+    req.body.nombre = req.body.nombre.trim().toLowerCase();
+  }
+  next();
+};
+
+// Aplicar múltiples middlewares a una ruta
+app.post('/registro',
+  validarEmail,
+  normalizarTexto,
+  (req, res) => {
+    res.json({ success: true, datos: req.body });
+  }
+);
+
+// Middleware condicional
+const soloDesarrollo = (req, res, next) => {
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Request:', req.method, req.url);
+  }
+  next();
+};`,
+      git: ''
+    }
+  },
+  {
+    id: 'express-11',
+    title: '11. Error handling middleware',
+    description: 'Los errores en Express se manejan con un middleware especial de 4 parámetros. Si ninguna ruta coincide, llega aquí.',
+    language: 'express',
+    category: 'middleware',
+    code: {
+      html: '',
+      css: '',
+      javascript: `const express = require('express');
+const app = express();
+
+// Middleware 404: cuando no hay ruta que coincida
+app.use((req, res, next) => {
+  res.status(404).json({
+    error: 'No encontrado',
+    ruta: req.url
+  });
+});
+
+// Middleware de errores (DEBE tener 4 parámetros)
+app.use((err, req, res, next) => {
+  console.error('Error:', err.message);
+
+  // Manejar errores específicos
+  if (err.name === 'ValidationError') {
+    return res.status(400).json({ error: err.message });
+  }
+
+  if (err.code === 'ENOENT') {
+    return res.status(404).json({ error: 'Archivo no encontrado' });
+  }
+
+  // Error genérico
+  res.status(500).json({
+    error: 'Error interno',
+    mensaje: process.env.NODE_ENV === 'development' ? err.message : 'Oculto'
+  });
+});
+
+// Para lanzar errores desde rutas:
+app.get('/fallar', (req, res, next) => {
+  next(new Error('Algo salió mal intencionalmente'));
+});`,
+      git: ''
+    }
+  },
+  // Datos y Seguridad
+  {
+    id: 'express-12',
+    title: '12. Body parsing',
+    description: 'req.body contiene los datos enviados en POST/PUT. express.json() parsea JSON automáticamente. Para formularios usa urlencoded.',
+    language: 'express',
+    category: 'datos',
+    code: {
+      html: '',
+      css: '',
+      javascript: `const express = require('express');
+const app = express();
+
+// Middleware para parsear JSON
+app.use(express.json());
+
+// Datos desde un formulario HTML
+// <form method="POST" action="/contacto">
+app.use(express.urlencoded({ extended: true }));
+
+app.post('/contacto', (req, res) => {
+  // Datos del formulario
+  const { nombre, email, mensaje } = req.body;
+  res.json({ recibido: { nombre, email, mensaje } });
+});
+
+app.post('/api/productos', (req, res) => {
+  // JSON del body
+  const producto = req.body;
+  console.log('Producto:', producto);
+  res.status(201).json({ id: 1, ...producto });
+});
+
+// Para binary data (imágenes, archivos)
+// const multer = require('multer');
+// app.use(multer().single('archivo'));`,
+      git: ''
+    }
+  },
+  {
+    id: 'express-13',
+    title: '13. CORS',
+    description: 'CORS (Cross-Origin Resource Sharing) permite que tu API sea accesible desde otros dominios. Sin CORS, el navegador lo bloquea.',
+    language: 'express',
+    category: 'cors',
+    code: {
+      html: '',
+      css: '',
+      javascript: `// npm install cors
+const express = require('express');
+const cors = require('cors');
+const app = express();
+
+// CORS básico: permite todos los orígenes
+app.use(cors());
+
+// CORS configurado: solo ciertos orígenes
+app.use(cors({
+  origin: ['http://localhost:3000', 'https://midominio.com'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// Rutas (después de CORS)
+// GET desde localhost:3001 a localhost:3000 ahora funciona
+
+app.get('/datos', (req, res) => {
+  res.json({ mensaje: 'Datos accesibles desde otros orígenes' });
+});
+
+// Preflight request (OPTIONS) se maneja automáticamente`,
+      git: ''
+    }
+  },
+  {
+    id: 'express-14',
+    title: '14. Environment variables',
+    description: 'Las variables de entorno (process.env) almacenan configuración que cambia entre entornos: desarrollo, producción, test.',
+    language: 'express',
+    category: 'datos',
+    code: {
+      html: '',
+      css: '',
+      javascript: `// npm install dotenv
+require('dotenv').config();
+
+const express = require('express');
+const app = express();
+
+// process.env contiene las variables de entorno
+// PORT: puerto del servidor
+// NODE_ENV: development | production | test
+// DATABASE_URL: conexión a la base de datos
+// SECRET_KEY: para JWT, sesiones, etc.
+
+const PORT = process.env.PORT || 3000;
+const NODE_ENV = process.env.NODE_ENV || 'development';
+
+app.get('/info', (req, res) => {
+  res.json({
+    puerto: PORT,
+    entorno: NODE_ENV,
+    nodeVersion: process.version
+  });
+});
+
+app.listen(PORT, () => {
+  console.log(\`Servidor en modo \${NODE_ENV}\`);
+});
+
+// .env archivo (NUNCA committing al git):
+// PORT=3000
+// NODE_ENV=development
+// DATABASE_URL=postgres://user:pass@localhost:5432/mydb`,
+      git: ''
+    }
+  },
+  {
+    id: 'express-15',
+    title: '15. dotenv',
+    description: 'dotenv carga variables desde un archivo .env a process.env. Mantiene secrets fuera del código y facilita cambiar configuración.',
+    language: 'express',
+    category: 'datos',
+    code: {
+      html: '',
+      css: '',
+      javascript: `// .env (en la raíz del proyecto)
+PORT=3003
+NODE_ENV=development
+DATABASE_URL=postgres://localhost/mydb
+JWT_SECRET=mi_secreto_super_seguro
+API_KEY=1234567890
+
+// --- index.js ---
+// Cargar dotenv AL PRINCIPIO de todo
+require('dotenv').config();
+
+const express = require('express');
+const app = express();
+
+console.log('PORT:', process.env.PORT);       // 3003
+console.log('SECRET:', process.env.JWT_SECRET); // mi_secreto...
+
+// El resto del código usa process.env normalmente
+app.get('/', (req, res) => {
+  res.send('Listo');
+});
+
+app.listen(process.env.PORT, () => {
+  console.log('Corriendo en puerto', process.env.PORT);
+});
+
+// .gitignore debe incluir:
+// .env
+// node_modules/`,
+      git: ''
+    }
+  },
+  // Arquitectura
+  {
+    id: 'express-16',
+    title: '16. express.Router()',
+    description: 'express.Router() crea un mini-app para organizar rutas relacionadas. Cada router tiene sus propios middleware y rutas.',
+    language: 'express',
+    category: 'arquitectura',
+    code: {
+      html: '',
+      css: '',
+      javascript: `// --- routes/usuarios.js ---
+const express = require('express');
+const router = express.Router();
+
+// Middleware específico de este router
+router.use((req, res, next) => {
+  console.log('Ruta de usuario:', req.url);
+  next();
+});
+
+// GET /api/usuarios
+router.get('/', (req, res) => {
+  res.json([{ id: 1, nombre: 'Ana' }]);
+});
+
+// GET /api/usuarios/:id
+router.get('/:id', (req, res) => {
+  res.json({ id: req.params.id });
+});
+
+// POST /api/usuarios
+router.post('/', (req, res) => {
+  res.status(201).json(req.body);
+});
+
+module.exports = router;
+
+// --- app.js ---
+const usuariosRouter = require('./routes/usuarios');
+
+app.use('/api/usuarios', usuariosRouter);
+// Ahora todas las rutas de usuariosRouter tienen prefijo /api/usuarios`,
+      git: ''
+    }
+  },
+  {
+    id: 'express-17',
+    title: '17. Modelo de 3 capas',
+    description: 'La arquitectura de 3 capas separa: Presentation (routes), Business Logic (controllers/services), Data Access (models). Cada capa tiene una responsabilidad clara.',
+    language: 'express',
+    category: 'arquitectura',
+    code: {
+      html: '',
+      css: '',
+      javascript: `// --- routes/usuarios.js (PRESENTATION) ---
+const express = require('express');
+const router = express.Router();
+const controller = require('../controllers/usuariosController');
+
+router.get('/', controller.obtenerTodos);
+router.get('/:id', controller.obtenerUno);
+router.post('/', controller.crear);
+
+module.exports = router;
+
+// --- controllers/usuariosController.js (BUSINESS LOGIC) ---
+const service = require('../services/usuariosService');
+
+const obtenerTodos = async (req, res, next) => {
+  try {
+    const filtros = req.query;
+    const usuarios = await service.buscarTodos(filtros);
+    res.json(usuarios);
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { obtenerTodos, obtenerUno, crear };
+
+// --- services/usuariosService.js (BUSINESS LOGIC) ---
+const model = require('../models/usuariosModel');
+
+const buscarTodos = async (filtros) => {
+  const usuarios = await model.findAll(filtros);
+  return usuarios.map(u => ({
+    ...u,
+    nombre: u.nombre.toUpperCase() // transformación
+  }));
+};
+
+module.exports = { buscarTodos };
+
+// --- models/usuariosModel.js (DATA ACCESS) ---
+// Se conecta directamente a la base de datos
+const findAll = async (filtros) => {
+  // SQL: SELECT * FROM usuarios WHERE ...
+  return [{ id: 1, nombre: 'Ana' }];
+};`,
+      git: ''
+    }
+  },
+  {
+    id: 'express-18',
+    title: '18. Buenas prácticas',
+    description: 'Patrones para Express en producción: organización del código, manejo de errores, seguridad básica, configuración, y testing.',
+    language: 'express',
+    category: 'buenas-practicas',
+    code: {
+      html: '',
+      css: '',
+      javascript: `// 1. Estructura de proyecto organizada
+// /src
+//   /routes    → app.get(), app.post()
+//   /controllers → lógica de cada ruta
+//   /services  → lógica de negocio
+//   /models    → acceso a datos
+//   /middleware → auth, validation, etc.
+//   /utils     → helpers
+//   app.js
+//   server.js
+
+// 2. Middleware de errores SIEMPRE
+app.use((err, req, res, next) => {
+  res.status(err.status || 500).json({
+    error: process.env.NODE_ENV === 'production'
+      ? 'Error interno'
+      : err.message
+  });
+});
+
+// 3. Security headers
+app.use(helmet());
+
+// 4. Rate limiting (npm install express-rate-limit)
+// const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100 });
+// app.use('/api/', limiter);
+
+// 5. Variables de entorno para config
+const config = {
+  port: process.env.PORT || 3000,
+  dbUrl: process.env.DATABASE_URL,
+  jwtSecret: process.env.JWT_SECRET
+};
+
+// 6. Logging en producción
+app.use(morgan('combined'));
+
+// 7. No exponer detalles de errores en producción`,
+      git: ''
+    }
+  },
+];
+
+// Export all lessons combined (HTML/CSS/JS/Git + Node.js + Express)
+export const lessons: Lesson[] = [
+  ...frontendLessons,
+  ...nodejsLessons,
+  ...expressLessons,
+];
+
 export const categories = [
   // HTML/CSS/JS
   'introduccion', 'estructura', 'titulos', 'parrafos', 'saltos', 'formato',
   'contenedores', 'listas', 'imagenes', 'videos', 'enlaces', 'navegacion',
   'formularios', 'inputs', 'semantico', 'estructura-completa', 'buenas-practicas',
   // Git
-  'fundamentos', 'trabajo-diario', 'ramas', 'deshacer', 'github'
+  'fundamentos', 'trabajo-diario', 'ramas', 'deshacer', 'github',
+  // Node.js
+  'flujos', 'async', 'modulos', 'archivos', 'eventos',
+  // Express.js
+  'routing', 'middleware', 'datos', 'cors', 'arquitectura'
 ];

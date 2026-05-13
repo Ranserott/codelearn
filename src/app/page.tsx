@@ -31,6 +31,18 @@ const sectionMeta = {
     description: 'El sistema de control de versiones que todo desarrollador debe conocer. Gestiona cambios, colabora con otros y mantiene tu historial de código.',
     color: 'from-red-500 to-orange-500',
   },
+  nodejs: {
+    title: 'Node.js',
+    subtitle: 'Entorno de ejecución',
+    description: 'Lleva JavaScript al servidor. Aprende a crear APIs, trabajar con archivos y entender el modelo asíncrono de Node.',
+    color: 'from-cyan-500 to-blue-500',
+  },
+  express: {
+    title: 'Express.js',
+    subtitle: 'Framework web',
+    description: 'El framework más popular para Node.js. Construye servidores web, APIs REST y aprende el patrón de middleware.',
+    color: 'from-green-500 to-emerald-500',
+  },
 };
 
 export default function Home() {

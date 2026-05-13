@@ -22,6 +22,17 @@ export default function Card({ lesson }: CardProps) {
     dom: darkMode ? 'from-yellow-500/20 to-amber-500/20 border-yellow-500/30' : 'from-yellow-50 to-amber-50 border-yellow-200',
     arrays: darkMode ? 'from-green-500/20 to-emerald-500/20 border-green-500/30' : 'from-green-50 to-emerald-50 border-green-200',
     async: darkMode ? 'from-teal-500/20 to-cyan-500/20 border-teal-500/30' : 'from-teal-50 to-cyan-50 border-teal-200',
+    // Node.js
+    modulos: darkMode ? 'from-violet-500/20 to-purple-500/20 border-violet-500/30' : 'from-violet-50 to-purple-50 border-violet-200',
+    archivos: darkMode ? 'from-yellow-500/20 to-amber-500/20 border-yellow-500/30' : 'from-yellow-50 to-amber-50 border-yellow-200',
+    servidor: darkMode ? 'from-orange-500/20 to-red-500/20 border-orange-500/30' : 'from-orange-50 to-red-50 border-orange-200',
+    flujos: darkMode ? 'from-pink-500/20 to-rose-500/20 border-pink-500/30' : 'from-pink-50 to-rose-50 border-pink-200',
+    eventos: darkMode ? 'from-teal-500/20 to-cyan-500/20 border-teal-500/30' : 'from-teal-50 to-cyan-50 border-teal-200',
+    // Express.js
+    routing: darkMode ? 'from-green-500/20 to-emerald-500/20 border-green-500/30' : 'from-green-50 to-emerald-50 border-green-200',
+    middleware: darkMode ? 'from-purple-500/20 to-violet-500/20 border-purple-500/30' : 'from-purple-50 to-violet-50 border-purple-200',
+    cors: darkMode ? 'from-orange-500/20 to-amber-500/20 border-orange-500/30' : 'from-orange-50 to-amber-50 border-orange-200',
+    arquitectura: darkMode ? 'from-cyan-500/20 to-blue-500/20 border-cyan-500/30' : 'from-cyan-50 to-blue-50 border-cyan-200',
   };
 
   const languageColors = {
@@ -29,6 +40,8 @@ export default function Card({ lesson }: CardProps) {
     css: darkMode ? 'text-blue-400' : 'text-blue-600',
     javascript: darkMode ? 'text-yellow-400' : 'text-yellow-600',
     git: darkMode ? 'text-red-400' : 'text-red-600',
+    nodejs: darkMode ? 'text-cyan-400' : 'text-cyan-600',
+    express: darkMode ? 'text-green-400' : 'text-green-600',
   };
 
   const colorClass = categoryColors[lesson.category] || categoryColors.fundamentos;
